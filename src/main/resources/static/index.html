@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>단어 학습 퀴즈</title>
+<style>
+    /* 화면을 보기 좋게 만들기 위한 CSS 스타일 */
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1 { color: #333; }
+    #quiz-list { list-style: none; padding: 0; }
+    #quiz-list li { 
+        background-color: #f4f4f4; 
+        margin-bottom: 10px; 
+        padding: 10px; 
+        border-radius: 5px; 
+        border-left: 5px solid #007bff;
+    }
+</style>
+</head>
+<body>
+    <h1>오늘의 학습 단어 목록</h1>
+    <ul id="quiz-list">
+        <li>단어를 불러오는 중입니다...</li>
+    </ul>
+
+    <script>
+        // 자바스크립트 코드를 넣어 API를 호출합니다.
+        
+        // 1번 사용자의 퀴즈를 요청하는 URL
+        const API_URL = 'http://localhost:8080/api/start/1';
+        const quizListElement = document.getElementById('quiz-list');
+
+        async function fetchQuiz() {
+            try {
+                // API 호출 (Postman에서 성공했던 GET 요청)
+                const response = await fetch(API_URL);
+                
+                // HTTP 상태 코드가 200 (성공)이 아니면 에러를 발생시킵니다.
+                if (!response.ok) {
+                    throw new Error(`HTTP 오류! 상태 코드: ${response.status}`);
+                }
+
+                // 응답받은 JSON 데이터를 파싱합니다.
+                const quizData = await response.json();
+
+                // 기존 로딩 메시지를 지웁니다.
+                quizListElement.innerHTML = ''; 
+
+                if (quizData.length === 0) {
+                    quizListElement.innerHTML = '<li>불러올 단어가 없습니다.</li>';
+                    return;
+                }
+             // 단어 데이터를 화면에 표시합니다.
+                quizData.forEach(item => { // 변수명을 'word' 대신 'item'으로 바꿔 혼동을 줄입니다.
+                    const listItem = document.createElement('li');
+                    
+                    // 👇👇 이 부분을 'item.word' 객체를 참조하도록 수정합니다.
+                    const spelling = item.word.spelling;
+                    const meaning = item.word.meaning;
+
+                    listItem.textContent = `${spelling}: ${meaning}`;
+                    
+                    quizListElement.appendChild(listItem);
+                });
+            } catch (error) {
+                // API 호출 실패 또는 파싱 오류 발생 시
+                console.error('퀴즈 데이터를 불러오는 중 오류 발생:', error);
+                quizListElement.innerHTML = `<li>오류 발생: ${error.message}. 서버가 켜져 있는지 확인하세요.</li>`;
+            }
+        }
+
+        // 함수 실행
+        fetchQuiz();
+    </script>
+</body>
+</html>

@@ -2,10 +2,18 @@ package com.mmb.service;
 
 import com.mmb.domain.*;
 import com.mmb.repository.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value; // ★ 추가
+import org.springframework.http.*; // ★ 추가
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.HttpClientErrorException;
 
+import java.net.URLEncoder; // ★ 추가
+import java.nio.charset.StandardCharsets; // ★ 추가
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,27 +25,49 @@ public class FullLearningService {
     private final MemberRepository memberRepository;
     private final WordRepository wordRepository;
     private final StudyRecordRepository studyRecordRepository;
+    
+    // API 호출을 위한 도구
+    private final RestTemplate restTemplate = new RestTemplate();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    // 1. 오늘의 퀴즈 생성 (복습 + 신규 = 목표량)
+    // ★ Papago API 키 주입 (application.properties에서 가져옴)
+    @Value("${papago.client.id}")
+    private String papagoClientId;
+
+    @Value("${papago.client.secret}")
+    private String papagoClientSecret;
+
+
+    // 1. 오늘의 퀴즈 생성
     @Transactional
     public List<StudyRecord> generateDailyQuiz(Long memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow();
-        int target = member.getDailyTarget(); // 사용자가 설정한 목표 (예: 30개)
+        // ID로 회원을 찾지 못하면 오류 발생 (이전 단계의 NoSuchElementException 방지)
+        Member member = memberRepository.findById(memberId).orElseThrow(
+            () -> new IllegalArgumentException("회원 ID를 찾을 수 없습니다: " + memberId)
+        );
+        
+        int target = member.getDailyTarget();
 
-        // A. 복습 단어 가져오기
+        // A. 오늘 복습해야 할 단어 가져오기
         List<StudyRecord> quizList = studyRecordRepository.findTodayReviews(memberId, LocalDate.now());
         
-        // B. 목표량이 부족하면 신규 단어 추가
+        // B. 목표량이 부족하면 신규 단어 추가 (외부 API 연동)
         if (quizList.size() < target) {
             int needed = target - quizList.size();
-            List<Word> newWords = fetchNewWordsFromApi(needed); // API 호출
+            
+            // ★ 진짜 API 호출해서 단어 가져오기
+            List<Word> newWords = fetchRealWordsFromApi(needed);
             
             for (Word w : newWords) {
-                // DB 중복 체크 후 저장
+                // DB 중복 체크 (이미 있는 단어면 저장 안 함)
                 if (!wordRepository.existsBySpelling(w.getSpelling())) {
                     wordRepository.save(w);
+                } else {
+                    // 이미 있으면 DB에 있는 걸 가져와서 씀 (ID 확보 위해)
+                    w = wordRepository.findBySpelling(w.getSpelling()); 
                 }
-                // 학습 기록 생성 (중복 방지)
+                
+                // 사용자의 학습 기록에 추가 (중복 학습 기록 생성 방지)
                 if (!studyRecordRepository.existsByMemberAndWord(member, w)) {
                     StudyRecord newRecord = new StudyRecord(member, w);
                     studyRecordRepository.save(newRecord);
@@ -45,8 +75,117 @@ public class FullLearningService {
                 }
             }
         }
-        return quizList; // 최종 퀴즈 리스트 반환
+        
+        // 만약 API 호출 실패 등으로 30개가 안 채워졌어도 있는 만큼만 반환
+        return quizList;
     }
+
+    // =========================================================
+    // ★ [핵심] 외부 API 연동 로직
+    // =========================================================
+    private List<Word> fetchRealWordsFromApi(int count) {
+        List<Word> validWords = new ArrayList<>();
+        int tryCount = 0;
+
+        // 원하는 개수가 채워질 때까지 반복 (최대 시도 횟수 제한으로 무한루프 방지)
+        while (validWords.size() < count && tryCount < 5) {
+            tryCount++;
+            try {
+                // 1. 랜덤 단어 API 호출 (넉넉하게 요청)
+                String randomUrl = "https://random-word-api.herokuapp.com/word?number=" + (count * 2);
+                String[] randomWords = restTemplate.getForObject(randomUrl, String[].class);
+
+                if (randomWords == null) continue;
+
+                // 2. 각 단어의 뜻과 음성 조회 (Dictionary API)
+                for (String spelling : randomWords) {
+                    if (validWords.size() >= count) break;
+                    
+                    try {
+                        String dictUrl = "https://api.dictionaryapi.dev/api/v2/entries/en/" + spelling;
+                        String jsonResponse = restTemplate.getForObject(dictUrl, String.class);
+                        
+                        // JSON 파싱
+                        JsonNode root = objectMapper.readTree(jsonResponse);
+                        JsonNode firstEntry = root.get(0);
+                        
+                        // 영어 정의 추출
+                        String englishMeaning = firstEntry.path("meanings").get(0).path("definitions").get(0).path("definition").asText();
+                        
+                        // 예문 추출
+                        String example = firstEntry.path("meanings").get(0).path("definitions").get(0).path("example").asText(null);
+                        if(example == null || example.isEmpty()) example = "No example available for " + spelling;
+
+                        // 음성 파일 URL 추출
+                        String audioUrl = null;
+                        JsonNode phonetics = firstEntry.path("phonetics");
+                        
+                        if (phonetics.isArray()) {
+                            for (JsonNode node : phonetics) {
+                                if (node.has("audio") && !node.get("audio").asText().isEmpty() && node.get("audio").asText().endsWith(".mp3")) {
+                                    audioUrl = node.get("audio").asText();
+                                    break; 
+                                }
+                            }
+                        }
+                        
+                        // ★ 3. 영어 뜻을 한글로 번역
+                        String koreanMeaning = translateToKorean(englishMeaning);
+
+
+                        // 유효한 단어면 리스트에 추가
+                        validWords.add(new Word(spelling, koreanMeaning, example, audioUrl)); // ★ koreanMeaning 사용
+
+                    } catch (Exception e) {
+                        // 사전 API에 없는 단어는 그냥 건너뜀
+                        // System.out.println("사전에 없는 단어 패스: " + spelling);
+                    }
+                }
+            } catch (Exception e) {
+                // System.out.println("API 호출 중 오류: " + e.getMessage());
+            }
+        }
+        return validWords;
+    }
+
+
+    // =========================================================
+    // ★ [새 함수] Papago API를 사용하여 영어 -> 한글 번역 수행
+    // =========================================================
+    private String translateToKorean(String englishText) {
+        if (englishText == null || englishText.isEmpty()) {
+            return "번역할 내용이 없습니다.";
+        }
+
+        try {
+            String encodedText = URLEncoder.encode(englishText, StandardCharsets.UTF_8.toString());
+            String apiUrl = "https://openapi.naver.com/v1/papago/n2mt";
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            headers.set("X-Naver-Client-Id", papagoClientId);
+            headers.set("X-Naver-Client-Secret", papagoClientSecret);
+
+            String body = "source=en&target=ko&text=" + encodedText;
+            HttpEntity<String> request = new HttpEntity<>(body, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(
+                apiUrl,
+                HttpMethod.POST,
+                request,
+                String.class
+            );
+
+            // JSON 응답 파싱
+            JsonNode root = objectMapper.readTree(response.getBody());
+            return root.path("message").path("result").path("translatedText").asText("번역 실패");
+
+        } catch (Exception e) {
+            // System.out.println("번역 API 호출 중 오류: " + e.getMessage());
+            return "번역 오류: " + englishText; // 오류 시 원본 영어 뜻 반환
+        }
+    }
+
 
     // 2. 문제 채점 (점수 부여 로직)
     @Transactional
@@ -93,16 +232,5 @@ public class FullLearningService {
         // 힌트 제공 (첫 글자 보여주기 or 중간 글자)
         member.setLastHintDate(LocalDate.now()); // 사용 기록 저장
         return "힌트: 첫 글자는 [" + word.getSpelling().charAt(0) + "] 입니다.";
-    }
-
-    // (가짜 API - 실제로는 여기에 RestTemplate 코드 삽입)
-    private List<Word> fetchNewWordsFromApi(int count) {
-        List<Word> list = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            long rnd = System.currentTimeMillis() % 10000 + i;
-            // 예문(빈칸) 포함 데이터 생성
-            list.add(new Word("word" + rnd, "뜻" + rnd, "This is a sample sentence for _____ ."));
-        }
-        return list;
     }
 }

@@ -1,44 +1,45 @@
 package com.mmb.domain;
 
-import lombok.*;
 import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.LocalDate;
 
 @Entity
-@Getter @Setter @NoArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor // JSON 파싱을 위해 필수
+@AllArgsConstructor
 public class Member {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String username; // 로그인 ID
-    private String password;
+    @Column(unique = true)
+    private String username;
+
+    private String password; // 실제 앱이라면 암호화해야 함
+
     private String nickname;
-
-    // --- 학습 설정 ---
-    private int dailyTarget; // 하루 목표 (30, 50, 100...)
-
-    // --- 게임 요소 (캐릭터) ---
-    private int characterLevel; // 캐릭터 레벨 (1:알, 2:아기, 3:어른)
-    private int currentExp;     // 현재 경험치
-
-    // --- 힌트 기능 (하루 1회 제한) ---
-    private LocalDate lastHintDate; // 마지막으로 힌트 쓴 날짜
-
-    public Member(String username, String nickname, int dailyTarget) {
-        this.username = username;
-        this.nickname = nickname;
-        this.dailyTarget = dailyTarget;
-        this.characterLevel = 1; // 1단계부터 시작
-        this.currentExp = 0;
-    }
     
-    // 경험치 획득 로직
-    public void gainExp(int amount) {
-        this.currentExp += amount;
-        // 레벨업 로직 (예: 100점마다 레벨업)
-        if (this.currentExp >= 100 * this.characterLevel) {
-            this.currentExp = 0;
+    // 학습 목표
+    private int dailyTarget; 
+
+    // 캐릭터 레벨 및 경험치
+    private int characterLevel;
+    private int currentExp;
+    
+    // 힌트 사용 기록
+    private LocalDate lastHintDate;
+
+    // 경험치 증가 메서드
+    public void gainExp(int exp) {
+        this.currentExp += exp;
+        // 100점당 레벨업하는 간단한 로직 (예시)
+        if (this.currentExp >= 100) {
             this.characterLevel++;
+            this.currentExp -= 100;
         }
     }
 }

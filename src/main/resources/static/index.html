@@ -1,76 +1,117 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-<meta charset="UTF-8">
-<title>단어 학습 퀴즈</title>
-<style>
-    /* 화면을 보기 좋게 만들기 위한 CSS 스타일 */
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    h1 { color: #333; }
-    #quiz-list { list-style: none; padding: 0; }
-    #quiz-list li { 
-        background-color: #f4f4f4; 
-        margin-bottom: 10px; 
-        padding: 10px; 
-        border-radius: 5px; 
-        border-left: 5px solid #007bff;
-    }
-</style>
+    <meta charset="UTF-8">
+    <title>MMB (Memory Mastery Booster)</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        h1 { color: #333; }
+        .container { max-width: 800px; margin: auto; }
+        #quiz-list { list-style: none; padding: 0; }
+        #quiz-list li { 
+            background: #f9f9f9; 
+            margin-bottom: 10px; 
+            padding: 15px; 
+            border-radius: 5px; 
+            border-left: 5px solid #007bff; 
+        }
+        #quiz-list button { 
+            margin-left: 10px; 
+            padding: 5px 10px; 
+            cursor: pointer; 
+            background-color: #28a745; 
+            color: white; 
+            border: none; 
+            border-radius: 3px;
+        }
+        .error { color: red; font-weight: bold; }
+    </style>
 </head>
 <body>
-    <h1>오늘의 학습 단어 목록</h1>
+
+<div class="container">
+    <h1>📝 오늘의 단어 학습 퀴즈 (30개)</h1>
+    <p id="member-info">사용자 ID: 1 (임시)</p>
+    
+    <div class="error" id="error-message"></div>
+
+    <h2>단어 목록</h2>
     <ul id="quiz-list">
-        <li>단어를 불러오는 중입니다...</li>
+        <li>로딩 중...</li>
     </ul>
 
-    <script>
-        // 자바스크립트 코드를 넣어 API를 호출합니다.
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // 회원 ID는 Postman에서 받은 ID로 수정해야 합니다 (예: 1)
+        const memberId = 1; 
+        const quizStartUrl = `http://localhost:8080/api/start/${memberId}`;
         
-        // 1번 사용자의 퀴즈를 요청하는 URL
-        const API_URL = 'http://localhost:8080/api/start/1';
         const quizListElement = document.getElementById('quiz-list');
+        const errorElement = document.getElementById('error-message');
+        const memberInfoElement = document.getElementById('member-info');
 
-        async function fetchQuiz() {
-            try {
-                // API 호출 (Postman에서 성공했던 GET 요청)
-                const response = await fetch(API_URL);
-                
-                // HTTP 상태 코드가 200 (성공)이 아니면 에러를 발생시킵니다.
+        memberInfoElement.textContent = `사용자 ID: ${memberId}`;
+
+        fetch(quizStartUrl)
+            .then(response => {
                 if (!response.ok) {
-                    throw new Error(`HTTP 오류! 상태 코드: ${response.status}`);
+                    throw new Error('퀴즈 로드 실패 (HTTP Error): ' + response.statusText);
                 }
-
-                // 응답받은 JSON 데이터를 파싱합니다.
-                const quizData = await response.json();
-
-                // 기존 로딩 메시지를 지웁니다.
+                return response.json();
+            })
+            .then(quizData => {
                 quizListElement.innerHTML = ''; 
-
-                if (quizData.length === 0) {
-                    quizListElement.innerHTML = '<li>불러올 단어가 없습니다.</li>';
-                    return;
-                }
-             // 단어 데이터를 화면에 표시합니다.
-                quizData.forEach(item => { // 변수명을 'word' 대신 'item'으로 바꿔 혼동을 줄입니다.
+                errorElement.textContent = '';
+                
+                quizData.forEach(item => { 
                     const listItem = document.createElement('li');
                     
-                    // 👇👇 이 부분을 'item.word' 객체를 참조하도록 수정합니다.
-                    const spelling = item.word.spelling;
-                    const meaning = item.word.meaning;
+                    // StudyRecord 객체(item) 안의 Word 객체(item.word)에 접근
+                    if (item.word) {
+                        const spelling = item.word.spelling;
+                        const meaning = item.word.meaning;
+                        const example = item.word.exampleSentence;
+                        const audio = item.word.audioPath;
 
-                    listItem.textContent = `${spelling}: ${meaning}`;
-                    
+                        // 텍스트 표시
+                        const textContent = `${spelling}: ${meaning} (예문: ${example})`;
+                        const textSpan = document.createElement('span');
+                        textSpan.textContent = textContent;
+                        listItem.appendChild(textSpan);
+
+                        // 오디오 버튼 추가
+                        // audio가 유효한 URL일 때만 버튼 표시
+                        if (audio && audio.startsWith('http')) { 
+                            const audioBtn = document.createElement('button');
+                            audioBtn.textContent = '🔊 듣기';
+                            audioBtn.onclick = () => {
+                                // 새 Audio 객체를 생성하여 재생
+                                new Audio(audio).play().catch(e => console.error("Audio playback failed:", e));
+                            };
+                            listItem.appendChild(audioBtn);
+                        } else {
+                            // 오디오가 없는 단어임을 표시
+                            const noAudio = document.createElement('span');
+                            noAudio.textContent = ' (음성 X)';
+                            noAudio.style.color = '#888';
+                            listItem.appendChild(noAudio);
+                        }
+                    } else {
+                        listItem.textContent = '❗ 단어 데이터 로드 오류';
+                    }
+
                     quizListElement.appendChild(listItem);
                 });
-            } catch (error) {
-                // API 호출 실패 또는 파싱 오류 발생 시
-                console.error('퀴즈 데이터를 불러오는 중 오류 발생:', error);
-                quizListElement.innerHTML = `<li>오류 발생: ${error.message}. 서버가 켜져 있는지 확인하세요.</li>`;
-            }
-        }
+            })
+            .catch(error => {
+                // Postman에서 500 에러를 받았을 때도 여기로 넘어옵니다.
+                errorElement.textContent = '💥 서버 통신 또는 데이터 로드 중 오류 발생: ' + error.message;
+                console.error('Fetch Error:', error);
+            });
+    });
+</script>
 
-        // 함수 실행
-        fetchQuiz();
-    </script>
 </body>
 </html>

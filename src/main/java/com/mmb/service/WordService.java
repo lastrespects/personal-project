@@ -41,24 +41,18 @@ public class WordService {
                 example = generateExample(spelling);
             }
 
-            // 3) 엔티티 저장
+            // 3) TTS 시도 (실패해도 흐름 이어감)
+            String audioPath = ttsClient.synthesize(spelling + " — " + example, spelling);
+
+            // 4) 엔티티 저장
             Word w = Word.builder()
                     .spelling(spelling)
                     .meaning(meaning)
                     .exampleSentence(example)
-                    .audioPath(null)
+                    .audioPath(audioPath)
                     .build();
 
-            Word saved = wordRepository.save(w);
-
-            // 4) TTS 시도 (실패해도 흐름 이어감)
-            String audioPath = ttsClient.synthesize(spelling + " — " + example, spelling);
-            if (audioPath != null) {
-                saved.setAudioPath(audioPath);
-                saved = wordRepository.save(saved);
-            }
-
-            return saved;
+            return wordRepository.save(w);
         });
     }
 

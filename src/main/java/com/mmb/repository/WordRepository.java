@@ -1,13 +1,11 @@
+// WordRepository.java
 package com.mmb.repository;
 
-import com.mmb.domain.Word;
+import com.mmb.domain.Word; // 패키지 변경
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface WordRepository extends JpaRepository<Word, Long> {
-    
-    // 단어가 이미 DB에 존재하는지 확인 (true/false)
-    boolean existsBySpelling(String spelling);
+import java.util.Optional;
 
-    // ★ 추가됨: 단어 스펠링으로 단어 객체 찾아오기 (ID 조회용)
-    Word findBySpelling(String spelling);
+public interface WordRepository extends JpaRepository<Word, Long> {
+    Optional<Word> findBySpelling(String spelling);
 }

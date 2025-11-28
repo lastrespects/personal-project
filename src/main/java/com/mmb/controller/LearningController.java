@@ -1,55 +1,83 @@
 package com.mmb.controller;
 
-import com.mmb.domain.Member;
-import com.mmb.domain.StudyRecord;
-import com.mmb.repository.MemberRepository;
+import com.mmb.dto.Req;
+import com.mmb.dto.StudyRecordDto;
 import com.mmb.service.FullLearningService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 학습 관련 API 엔드포인트
+ * - /api/start : 오늘의 퀴즈
+ * - /api/study/{studyRecordId}/wrong : 틀림 처리
+ * - /api/study/{studyRecordId}/like : 좋아요/취소 처리
+ */
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class LearningController {
 
-    private final MemberRepository memberRepository;
     private final FullLearningService fullLearningService;
+    private final Req req; // 세션 관리를 위해 Req 객체 주입
 
-    // 1. 회원 가입 및 로그인 (Member 생성) API
-    // URL: POST http://localhost:8080/api/join
-    // Body: JSON {"username": "user1", "nickname": "final_user", "dailyTarget": 30}
-    @PostMapping("/join")
-    public Member createMember(@RequestBody Member member) {
-        // 이미 존재하는 사용자인지 확인 (간단한 로그인 로직으로 대체)
-        Member existingMember = memberRepository.findByUsername(member.getUsername());
-        if (existingMember != null) {
-            // 이미 있으면 기존 사용자 정보 반환 (로그인 성공)
-            return existingMember; 
+    /**
+     * 오늘의 퀴즈를 생성하고 조회합니다. (로그인 필요)
+     */
+    @GetMapping("/start")
+    public ResponseEntity<?> start() {
+        if (req.getLoginedMember().getId() == 0) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 후 이용해주세요.");
         }
-
-        // 새로운 사용자 생성 및 저장 (회원 가입)
-        member.setDailyTarget(member.getDailyTarget() > 0 ? member.getDailyTarget() : 30); // 목표가 없으면 기본 30
-        member.setCharacterLevel(1);
-        member.setCurrentExp(0);
         
-        return memberRepository.save(member);
+        try {
+            int memberId = req.getLoginedMember().getId();
+            List<StudyRecordDto> quiz = fullLearningService.generateDailyQuizDto(memberId);
+            return ResponseEntity.ok(quiz);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("퀴즈 생성 중 서버 오류가 발생했습니다.");
+        }
+    }
+
+    /**
+     * 퀴즈 문제 틀림 처리 (로그인 필요)
+     */
+    @PostMapping("/study/{studyRecordId}/wrong")
+    public ResponseEntity<?> markWrong(@PathVariable int studyRecordId) {
+        if (req.getLoginedMember().getId() == 0) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 후 이용해주세요.");
+        }
+        try {
+            fullLearningService.markWrong(studyRecordId);
+            return ResponseEntity.ok("marked wrong");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
     
-    // 2. 오늘의 퀴즈 시작 API
-    // URL: GET http://localhost:8080/api/start/{memberId}
-    @GetMapping("/start/{memberId}")
-    public List<StudyRecord> startDailyQuiz(@PathVariable Long memberId) {
-        return fullLearningService.generateDailyQuiz(memberId);
+    /**
+     * 퀴즈 문제(StudyRecord)에 좋아요를 누르거나 취소합니다. (로그인 필요)
+     */
+    @PostMapping("/study/{studyRecordId}/like")
+    public ResponseEntity<?> toggleLike(@PathVariable int studyRecordId) {
+        if (req.getLoginedMember().getId() == 0) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 후 이용해주세요.");
+        }
+        
+        try {
+            int memberId = req.getLoginedMember().getId();
+            String result = fullLearningService.toggleLikeStudyRecord(memberId, studyRecordId);
+            
+            return ResponseEntity.ok(result); 
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("좋아요 실패: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("서버 오류가 발생했습니다.");
+        }
     }
-
-    // 3. 문제 채점 API (나중에 구현)
-    // URL: POST http://localhost:8080/api/grade/{recordId}
-    /*
-    @PostMapping("/grade/{recordId}")
-    public String gradeAnswer(@PathVariable Long recordId, @RequestBody AnswerRequest request) {
-        return fullLearningService.gradeAnswer(recordId, request.getAnswer());
-    }
-    */
 }

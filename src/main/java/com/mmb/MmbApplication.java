@@ -1,12 +1,16 @@
-package com.mmb; // com.mmb 바로 아래에 있어야 합니다.
+package com.mmb;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
 
-@SpringBootApplication // 👈 스프링 부트의 모든 자동 설정을 활성화하는 핵심 어노테이션입니다.
+@MapperScan(basePackages = "com.mmb.dao") 
+@SpringBootApplication
+@EnableAsync
 public class MmbApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(MmbApplication.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(SpringApplication.class, args);
+	}
 }

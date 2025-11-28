@@ -1,50 +1,91 @@
--- src/main/resources/data.sql
+DROP DATABASE IF EXISTS SB_AM;
+CREATE DATABASE SB_AM;
+USE SB_AM;
 
--- 1. 테이블이 존재하면 삭제 (재시작 시 오류 방지)
-DROP TABLE IF EXISTS WORD;
-DROP TABLE IF EXISTS MEMBER;
-DROP TABLE IF EXISTS STUDY_RECORD;
-
--- 2. WORD 테이블 생성 (Word.java를 참고하여 필드를 맞춰야 합니다.)
-CREATE TABLE WORD (
-    id BIGINT NOT NULL,
-    spelling VARCHAR(255) NOT NULL,
-    meaning VARCHAR(255) NOT NULL,
-    example_sentence VARCHAR(500),
-    audio_path VARCHAR(255),
-    PRIMARY KEY (id)
+CREATE TABLE article(
+    id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT
+    , regDate DATETIME NOT NULL
+    , updateDate DATETIME NOT NULL
+    , memberId INT UNSIGNED NOT NULL
+    , title VARCHAR(100) NOT NULL
+    , content TEXT NOT NULL
+    , boardId INT UNSIGNED NOT NULL
+    , views INT UNSIGNED NOT NULL DEFAULT 0
 );
 
--- 3. MEMBER 테이블 생성 (Member.java를 참고)
-CREATE TABLE MEMBER (
-    id BIGINT NOT NULL,
-    username VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    nickname VARCHAR(255) NOT NULL,
-    daily_target INT NOT NULL,
-    character_level INT NOT NULL,
-    current_exp INT NOT NULL,
-    last_hint_date DATE,
-    PRIMARY KEY (id)
+CREATE TABLE `member`(
+    id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT
+    , regDate DATETIME NOT NULL
+    , updateDate DATETIME NOT NULL
+    , loginId VARCHAR(50) NOT NULL
+    , loginPw VARCHAR(100) NOT NULL
+    , `name` VARCHAR(20) NOT NULL
+    , authLevel INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '관리자 = 0, 사용자 = 1'
+    
+    -- [학습 기능 필드 추가]
+    , dailyTarget INT UNSIGNED NOT NULL DEFAULT 10
+    , characterLevel INT UNSIGNED NOT NULL DEFAULT 1
+    , currentExp INT UNSIGNED NOT NULL DEFAULT 0
 );
 
--- 4. STUDY_RECORD 테이블 생성 (StudyRecord.java를 참고)
-CREATE TABLE STUDY_RECORD (
-    id BIGINT NOT NULL,
-    member_id BIGINT,
-    word_id BIGINT,
-    review_date DATE,
-    next_review_date DATE,
-    wrong_count INT,
-    PRIMARY KEY (id),
-    FOREIGN KEY (member_id) REFERENCES MEMBER(id),
-    FOREIGN KEY (word_id) REFERENCES WORD(id)
+CREATE TABLE board(
+    id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT
+    , boardName VARCHAR(20) NOT NULL
 );
 
--- 5. 실제 단어 데이터 삽입
--- 테이블이 만들어진 후에 삽입 쿼리가 실행되어야 합니다.
-INSERT INTO WORD (id, spelling, meaning, example_sentence, audio_path) 
-VALUES (1, 'apple', '사과', 'I ate an apple for breakfast.', 'apple.mp3');
+CREATE TABLE likePoint(
+    memberId INT NOT NULL
+    , relTypeCode VARCHAR(20) NOT NULL
+    , relId INT UNSIGNED NOT NULL
+);
 
-INSERT INTO WORD (id, spelling, meaning, example_sentence, audio_path) 
-VALUES (2, 'banana', '바나나', 'I like to eat a banana with milk.', 'banana.mp3');
+CREATE TABLE reply(
+    id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT
+    , regDate DATETIME NOT NULL
+    , updateDate DATETIME NOT NULL
+    , memberId INT UNSIGNED NOT NULL
+    , relTypeCode VARCHAR(20) NOT NULL
+    , relId INT UNSIGNED NOT NULL
+    , content VARCHAR(500) NOT NULL
+);
+
+CREATE TABLE `file`(
+    id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT
+    , regDate DATETIME NOT NULL
+    , originName VARCHAR(50) NOT NULL
+    , savedName VARCHAR(100) NOT NULL
+    , savedPath VARCHAR(100) NOT NULL
+);
+
+-- [JPA 엔티티용 테이블]
+CREATE TABLE word(
+    id BIGINT PRIMARY KEY AUTO_INCREMENT
+    , spelling VARCHAR(50) NOT NULL UNIQUE
+    , meaning VARCHAR(500)
+    , example_sentence VARCHAR(1000)
+    , audio_path VARCHAR(255)
+);
+
+CREATE TABLE study_record(
+    id BIGINT PRIMARY KEY AUTO_INCREMENT
+    , member_id INT UNSIGNED NOT NULL
+    , word_id BIGINT NOT NULL
+    , review_step INT NOT NULL
+    , wrong_count INT NOT NULL DEFAULT 0
+    , next_review_date DATE NOT NULL
+    , FOREIGN KEY (member_id) REFERENCES `member`(id)
+    , FOREIGN KEY (word_id) REFERENCES word(id)
+);
+
+
+-- [더미 데이터는 사용자님의 기존 코드를 유지하며, member 테이블에 학습 필드 기본값 추가]
+
+INSERT INTO article
+    SET regDate = NOW()
+        , updateDate = NOW()
+        , memberId = 2
+        , title = '제목1'
+        , content = '내용1'
+        , boardId = 2;
+        
+-- ... (나머지 기존 더미 데이터 유지) ...

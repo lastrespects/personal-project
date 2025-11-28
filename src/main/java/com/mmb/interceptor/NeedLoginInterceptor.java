@@ -1,0 +1,33 @@
+// NeedLoginInterceptor.java
+package com.mmb.interceptor;
+
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerInterceptor;
+
+import com.mmb.dto.Req; // 패키지 변경
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@Component
+public class NeedLoginInterceptor implements HandlerInterceptor {
+	
+	private Req req;
+	
+	public NeedLoginInterceptor(Req req) {
+		this.req = req;
+	}
+	
+	@Override
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws Exception {
+
+		if (this.req.getLoginedMember().getId() == 0) {
+			this.req.jsPrintReplace("로그인 후 이용해주세요", "/usr/member/login");
+			return false;
+		}
+		
+		return HandlerInterceptor.super.preHandle(request, response, handler);
+	}
+	
+}

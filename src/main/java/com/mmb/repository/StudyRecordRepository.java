@@ -1,21 +1,24 @@
 package com.mmb.repository;
 
 import com.mmb.domain.StudyRecord;
-import com.mmb.domain.Member;
 import com.mmb.domain.Word;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
-// StudyRecord 엔티티를 관리하며, 망각곡선 로직의 핵심 쿼리를 제공합니다.
 public interface StudyRecordRepository extends JpaRepository<StudyRecord, Long> {
-    
-    // 오늘 복습해야 할 단어 목록 조회 (핵심 쿼리)
-    @Query("SELECT r FROM StudyRecord r WHERE r.member.id = :memberId AND r.nextReviewDate <= :today")
-    List<StudyRecord> findTodayReviews(@Param("memberId") Long memberId, @Param("today") LocalDate today);
-    
-    // 해당 사용자가 특정 단어를 이미 학습 중인지 확인
-    boolean existsByMemberAndWord(Member member, Word word);
+
+    // `member_id`를 기준으로 조회하도록 native query 사용
+    @Query(value = "SELECT * FROM study_record WHERE member_id = :memberId AND next_review_date <= :date", nativeQuery = true)
+    List<StudyRecord> findTodayReviews(@Param("memberId") int memberId, @Param("date") LocalDate date);
+
+    // `member_id`와 Word 객체로 존재 여부 확인
+    boolean existsByMemberIdAndWord(int memberId, Word word);
+
+    // JPA 메서드에서 memberId를 인자로 받도록 수정
+    Optional<StudyRecord> findById(Long id);
 }

@@ -48,7 +48,7 @@ public class FullLearningService {
     /**
      * 일일 퀴즈 생성 (비동기 처리)
      */
-    @Transactional(readOnly = true)
+    @Transactional
     public List<StudyRecordDto> generateDailyQuizDto(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));

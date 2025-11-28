@@ -35,7 +35,7 @@ public class TtsClient {
         try {
             MediaType json = MediaType.get("application/json; charset=utf-8");
             // 예시 body — 실제 스펙에 맞춰 조정 필요
-            String bodyJson = "{ \"model\":\"gpt-4o-mini-tts\", \"voice\":\"alloy\", \"input\": \"" + escapeJson(text) + "\" }";
+            String bodyJson = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(java.util.Map.of("model", "gpt-4o-mini-tts", "voice", "alloy", "input", text));
             RequestBody body = RequestBody.create(bodyJson, json);
 
             Request req = new Request.Builder()

@@ -18,7 +18,7 @@ public class DictionaryApiClient {
             DictionaryApiResponse[] resp = rest.getForObject(url, DictionaryApiResponse[].class);
             if (resp != null && resp.length > 0) return resp[0];
         } catch (Exception e) {
-            System.err.println("dictionary fetch failed for " + spelling + " : " + e.getMessage());
+            log.error("dictionary fetch failed for {} : {}", spelling, e.getMessage());
         }
         return null;
     }

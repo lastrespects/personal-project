@@ -2,41 +2,40 @@ package com.mmb.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDate;
 
+/**
+ * Member 엔티티
+ * - builder 사용, lastHintDate는 LocalDate로 관리
+ */
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor // JSON 파싱을 위해 필수
+@NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@Table(name = "member")
 public class Member {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String username;
 
-    private String password; // 실제 앱이라면 암호화해야 함
-
+    private String password;
     private String nickname;
-    
-    // 학습 목표
-    private int dailyTarget; 
+    private int dailyTarget;
 
-    // 캐릭터 레벨 및 경험치
-    private int characterLevel;
-    private int currentExp;
-    
-    // 힌트 사용 기록
+    @Builder.Default
+    private int characterLevel = 1;
+
+    @Builder.Default
+    private int currentExp = 0;
+
     private LocalDate lastHintDate;
 
-    // 경험치 증가 메서드
     public void gainExp(int exp) {
         this.currentExp += exp;
-        // 100점당 레벨업하는 간단한 로직 (예시)
         if (this.currentExp >= 100) {
             this.characterLevel++;
             this.currentExp -= 100;

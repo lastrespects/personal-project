@@ -1,32 +1,34 @@
 package com.mmb.domain;
 
-import lombok.*;
 import jakarta.persistence.*;
+import lombok.*;
 import java.time.LocalDate;
 
+/**
+ * StudyRecord 엔티티
+ * - wrongCount로 오답 횟수를 카운트
+ * - nextReviewDate로 복습일을 제어
+ */
 @Entity
-@Getter @Setter @NoArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Table(name = "study_record")
 public class StudyRecord {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "word_id")
     private Word word;
 
-    private int reviewStep; // 망각곡선 단계 (0~5)
-    private LocalDate nextReviewDate; // 다음 복습일
-    private int wrongCount; // 틀린 횟수
-
-    public StudyRecord(Member member, Word word) {
-        this.member = member;
-        this.word = word;
-        this.reviewStep = 0;
-        this.wrongCount = 0;
-        this.nextReviewDate = LocalDate.now(); // 당장 학습
-    }
+    private int reviewStep;
+    private LocalDate nextReviewDate;
+    private int wrongCount;
 }

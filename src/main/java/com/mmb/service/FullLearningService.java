@@ -106,10 +106,10 @@ public class FullLearningService {
         try {
             java.net.URL url = new java.net.URL("https://random-word-api.herokuapp.com/word?number=" + number);
             try (java.io.InputStream in = url.openStream()) {
-                String json = new String(in.readAllBytes());
-                json = json.replaceAll("[\\[\\]\"]", "");
-                if (json.isBlank()) return List.of();
-                return Arrays.asList(json.split(","));
+                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                String[] words = mapper.readValue(in, String[].class);
+                if (words == null) return List.of();
+                return Arrays.asList(words);
             }
         } catch (Exception e) {
             System.err.println("random word fetch failed: " + e.getMessage());

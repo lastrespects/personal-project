@@ -1,145 +1,145 @@
-// UsrArticleController.java
-package com.mmb.controller;
-
-import java.util.List;
-
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.mmb.dto.Article; // 패키지 변경
-import com.mmb.dto.Req; // 패키지 변경
-import com.mmb.service.ArticleService; // 패키지 변경
-import com.mmb.service.BoardService; // 패키지 변경
-import com.mmb.util.Util; // 패키지 변경
-
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
-@Controller
-public class UsrArticleController {
-
-	private ArticleService articleService;
-	private BoardService boardService;
-	private Req req;
-
-	public UsrArticleController(ArticleService articleService, BoardService boardService, Req req) {
-		this.articleService = articleService;
-		this.boardService = boardService;
-		this.req = req;
-	}
-
-	@GetMapping("/usr/article/write")
-	public String write(Model model, int boardId) {
-
-		model.addAttribute("boardId", boardId);
-
-		return "usr/article/write";
-	}
-
-	@PostMapping("/usr/article/doWrite")
-	@ResponseBody
-	public String doWrite(String title, String content, int boardId) {
-
-		this.articleService.writeArticle(title, content, this.req.getLoginedMember().getId(), boardId);
-
-		int id = this.articleService.getLastInsertId();
-
-		return Util.jsReplace(String.format("%d번 게시물이 작성되었습니다", id), String.format("detail?id=%d", id));
-	}
-
-	@GetMapping("/usr/article/list")
-	public String list(Model model, int boardId, @RequestParam(defaultValue = "1") int cPage,
-			@RequestParam(defaultValue = "") String searchKeyword, String searchType) {
-
-		int itemsInAPage = 10;
-
-		int limitFrom = (cPage - 1) * itemsInAPage;
-
-		int articlesCnt = this.articleService.getArticlesCnt(boardId, searchType, searchKeyword.trim());
-
-		int totalPagesCnt = (int) Math.ceil(articlesCnt / (double) itemsInAPage);
-
-		int begin = ((cPage - 1) / 10) * 10 + 1;
-		int end = (((cPage - 1) / 10) + 1) * 10;
-
-		if (end > totalPagesCnt) {
-			end = totalPagesCnt;
+	// UsrArticleController.java
+	package com.mmb.controller;
+	
+	import java.util.List;
+	
+	import org.springframework.stereotype.Controller;
+	import org.springframework.ui.Model;
+	import org.springframework.web.bind.annotation.GetMapping;
+	import org.springframework.web.bind.annotation.PostMapping;
+	import org.springframework.web.bind.annotation.RequestParam;
+	import org.springframework.web.bind.annotation.ResponseBody;
+	
+	import com.mmb.dto.Article; // 패키지 변경
+	import com.mmb.dto.Req; // 패키지 변경
+	import com.mmb.service.ArticleService; // 패키지 변경
+	import com.mmb.service.BoardService; // 패키지 변경
+	import com.mmb.util.Util; // 패키지 변경
+	
+	import jakarta.servlet.http.Cookie;
+	import jakarta.servlet.http.HttpServletRequest;
+	import jakarta.servlet.http.HttpServletResponse;
+	
+	@Controller
+	public class UsrArticleController {
+	
+		private ArticleService articleService;
+		private BoardService boardService;
+		private Req req;
+	
+		public UsrArticleController(ArticleService articleService, BoardService boardService, Req req) {
+			this.articleService = articleService;
+			this.boardService = boardService;
+			this.req = req;
 		}
-
-		List<Article> articles = this.articleService.showList(boardId, limitFrom, itemsInAPage, searchType, searchKeyword.trim());
-		String boardName = this.boardService.getBoardNameById(boardId);
-
-		model.addAttribute("articles", articles);
-		model.addAttribute("boardName", boardName);
-		model.addAttribute("totalPagesCnt", totalPagesCnt);
-		model.addAttribute("articlesCnt", articlesCnt);
-		model.addAttribute("begin", begin);
-		model.addAttribute("end", end);
-		model.addAttribute("cPage", cPage);
-
-		return "usr/article/list";
-	}
-
-	@GetMapping("/usr/article/detail")
-	public String detail(HttpServletRequest request, HttpServletResponse response, Model model, int id) {
-
-		Cookie[] cookies = request.getCookies();
-		boolean isViewed = false;
-		
-		if (cookies != null) {
-			for (Cookie cookie : cookies) {
-				if (cookie.getName().equals("viewedArticle_" + id)) {
-					isViewed = true;
-					break;
+	
+		@GetMapping("/usr/article/write")
+		public String write(Model model, int boardId) {
+	
+			model.addAttribute("boardId", boardId);
+	
+			return "usr/article/write";
+		}
+	
+		@PostMapping("/usr/article/doWrite")
+		@ResponseBody
+		public String doWrite(String title, String content, int boardId) {
+	
+			this.articleService.writeArticle(title, content, this.req.getLoginedMember().getId(), boardId);
+	
+			int id = this.articleService.getLastInsertId();
+	
+			return Util.jsReplace(String.format("%d번 게시물이 작성되었습니다", id), String.format("detail?id=%d", id));
+		}
+	
+		@GetMapping("/usr/article/list")
+		public String list(Model model, int boardId, @RequestParam(defaultValue = "1") int cPage,
+				@RequestParam(defaultValue = "") String searchKeyword, String searchType) {
+	
+			int itemsInAPage = 10;
+	
+			int limitFrom = (cPage - 1) * itemsInAPage;
+	
+			int articlesCnt = this.articleService.getArticlesCnt(boardId, searchType, searchKeyword.trim());
+	
+			int totalPagesCnt = (int) Math.ceil(articlesCnt / (double) itemsInAPage);
+	
+			int begin = ((cPage - 1) / 10) * 10 + 1;
+			int end = (((cPage - 1) / 10) + 1) * 10;
+	
+			if (end > totalPagesCnt) {
+				end = totalPagesCnt;
+			}
+	
+			List<Article> articles = this.articleService.showList(boardId, limitFrom, itemsInAPage, searchType, searchKeyword.trim());
+			String boardName = this.boardService.getBoardNameById(boardId);
+	
+			model.addAttribute("articles", articles);
+			model.addAttribute("boardName", boardName);
+			model.addAttribute("totalPagesCnt", totalPagesCnt);
+			model.addAttribute("articlesCnt", articlesCnt);
+			model.addAttribute("begin", begin);
+			model.addAttribute("end", end);
+			model.addAttribute("cPage", cPage);
+	
+			return "usr/article/list";
+		}
+	
+		@GetMapping("/usr/article/detail")
+		public String detail(HttpServletRequest request, HttpServletResponse response, Model model, int id) {
+	
+			Cookie[] cookies = request.getCookies();
+			boolean isViewed = false;
+			
+			if (cookies != null) {
+				for (Cookie cookie : cookies) {
+					if (cookie.getName().equals("viewedArticle_" + id)) {
+						isViewed = true;
+						break;
+					}
 				}
 			}
+			
+			if (!isViewed) {
+				this.articleService.increaseViews(id);
+				Cookie cookie = new Cookie("viewedArticle_" + id, "true");
+				cookie.setMaxAge(60 * 30);
+				response.addCookie(cookie);
+			}
+			
+			Article article = this.articleService.getArticleById(id);
+			
+			model.addAttribute("article", article);
+	
+			return "usr/article/detail";
 		}
-		
-		if (!isViewed) {
-			this.articleService.increaseViews(id);
-			Cookie cookie = new Cookie("viewedArticle_" + id, "true");
-			cookie.setMaxAge(60 * 30);
-			response.addCookie(cookie);
+	
+		@GetMapping("/usr/article/modify")
+		public String modify(Model model, int id) {
+	
+			Article article = this.articleService.getArticleById(id);
+	
+			model.addAttribute("article", article);
+	
+			return "usr/article/modify";
 		}
-		
-		Article article = this.articleService.getArticleById(id);
-		
-		model.addAttribute("article", article);
-
-		return "usr/article/detail";
+	
+		@PostMapping("/usr/article/doModify")
+		@ResponseBody
+		public String doModify(int id, String title, String content) {
+	
+			this.articleService.modifyArticle(id, title, content);
+	
+			return Util.jsReplace(String.format("%d번 게시물의 수정이 완료되었습니다", id), String.format("detail?id=%d", id));
+		}
+	
+		@GetMapping("/usr/article/delete")
+		@ResponseBody
+		public String delete(int id, int boardId) {
+	
+			this.articleService.deleteArticle(id);
+	
+			return Util.jsReplace(String.format("%d번 게시물이 삭제되었습니다", id), String.format("list?boardId=%d", boardId));
+		}
+	
 	}
-
-	@GetMapping("/usr/article/modify")
-	public String modify(Model model, int id) {
-
-		Article article = this.articleService.getArticleById(id);
-
-		model.addAttribute("article", article);
-
-		return "usr/article/modify";
-	}
-
-	@PostMapping("/usr/article/doModify")
-	@ResponseBody
-	public String doModify(int id, String title, String content) {
-
-		this.articleService.modifyArticle(id, title, content);
-
-		return Util.jsReplace(String.format("%d번 게시물의 수정이 완료되었습니다", id), String.format("detail?id=%d", id));
-	}
-
-	@GetMapping("/usr/article/delete")
-	@ResponseBody
-	public String delete(int id, int boardId) {
-
-		this.articleService.deleteArticle(id);
-
-		return Util.jsReplace(String.format("%d번 게시물이 삭제되었습니다", id), String.format("list?boardId=%d", boardId));
-	}
-
-}

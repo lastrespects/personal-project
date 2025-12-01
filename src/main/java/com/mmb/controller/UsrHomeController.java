@@ -1,111 +1,46 @@
-// UsrHomeController.java
 package com.mmb.controller;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
+import com.mmb.service.MemberService;
+import com.mmb.service.ArticleService;
+import com.mmb.repository.StudyRecordRepository;
+import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
-
-import com.mmb.dto.FileDto; // 패키지 변경
-import com.mmb.service.FileService; // 패키지 변경
-import com.mmb.util.Util; // 패키지 변경
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
+@RequestMapping("/usr/home")
+@RequiredArgsConstructor
 public class UsrHomeController {
-	
-	private FileService fileService;
-	
-	public UsrHomeController(FileService fileService) {
-		this.fileService = fileService;
-	}
-	
-	@GetMapping("/usr/home/main")
-	public String showMain() {
-		return "usr/home/main";
-	}
-	
-	@GetMapping("/")
-	public String showRoot() {
-		return "redirect:/usr/home/main";
-	}
-	
-	@GetMapping("/usr/home/apiTest1")
-	public String apiTest1() {
-		return "usr/home/apiTest1";
-	}
-	
-	@GetMapping("/usr/home/apiTest2")
-	public String apiTest2() {
-		return "usr/home/apiTest2";
-	}
-	
-	@GetMapping("/usr/home/checkboxSubmit")
-	@ResponseBody
-	public String checkboxSubmit(@RequestParam(name = "chk", required = false) List<String> list) {
-		
-		if (list == null) {
-			return Util.jsReplace("체크박스 미선택", "/");
-		}
-		
-		for (String value : list) {
-			System.out.println("checkboxValue : " + value);
-		}
-		
-		return Util.jsReplace("전송된 체크박스 값 확인", "/");
-	}
-	
-	@PostMapping("/usr/home/ajaxCheckbox")
-	@ResponseBody
-	public List<Integer> ajaxCheckbox(@RequestParam List<Integer> chkList) {
-		
-		for (Integer i : chkList) {
-			System.out.println(i);
-		}
-		
-		return chkList;
-	}
-	
-	@PostMapping("/usr/home/upload")
-	@ResponseBody
-	public String upload(MultipartFile file) {
-		if (file.isEmpty()) {
-			return Util.jsReplace("파일이 선택되지 않았습니다", null);
-		}
-		
-		try {
-			this.fileService.saveFile(file);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return Util.jsReplace("파일을 업로드 하는데 문제가 발생했습니다", null);
-		}
-		
-		return Util.jsReplace("파일 업로드 성공", "/");
-	}
-	
-	@GetMapping("/usr/home/view")
-	public String view(Model model) {
-		List<FileDto> files = this.fileService.getFiles();
-		
-		model.addAttribute("files", files);
-		
-		return "usr/home/view";
-	}
-	
-	@GetMapping("/usr/home/file/{fileId}")
-	@ResponseBody
-	public Resource fileLoad(Model model, @PathVariable("fileId") int id) throws IOException {
-		
-		FileDto fileDto = this.fileService.getFileById(id);
-		
-		return new UrlResource("file:" + fileDto.getSavedPath());
-	}
+
+    private final MemberService memberService;
+    private final StudyRecordRepository studyRecordRepository;
+    private final ArticleService articleService; // 강사님 프로젝트에서 쓰던 서비스 재사용한다고 가정
+
+    @GetMapping("/main")
+    public String showMain(HttpSession session, Model model) {
+
+        Long loginedMemberId = (Long) session.getAttribute("loginedMemberId");
+
+        if (loginedMemberId != null) {
+            memberService.findById(loginedMemberId).ifPresent(member -> {
+                model.addAttribute("member", member);
+                // TODO: 오늘 학습 요약, 포인트, 레벨 등은 나중에 여기에서 계산
+            });
+        }
+
+        // 🔹 공지사항 최신 3개만 메인에 띄워주기
+        int noticeBoardId = 1;
+        var notices = articleService.findLatestArticles(noticeBoardId, 3); 
+        // ↑ 이 메서드는 강사님 list 로직을 응용해서 직접 만들면 됨 (예: boardId + limit로 조회)
+        model.addAttribute("notices", notices);
+
+        // 🔹 랭킹 (일단 TODO로 두고 나중에 구현)
+        // var ranking = studyRecordRepository.getTopRanking(5);
+        // model.addAttribute("ranking", ranking);
+
+        return "usr/home/main";
+    }
 }

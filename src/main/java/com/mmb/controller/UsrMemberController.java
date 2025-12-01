@@ -1,98 +1,58 @@
-// UsrMemberController.java
 package com.mmb.controller;
 
+import com.mmb.service.MemberService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-import com.mmb.dto.LoginedMember; // 패키지 변경
-import com.mmb.dto.Member; // 패키지 변경
-import com.mmb.dto.Req; // 패키지 변경
-import com.mmb.dto.ResultData; // 패키지 변경
-import com.mmb.service.MemberService; // 패키지 변경
-import com.mmb.util.Util; // 패키지 변경
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
+@RequestMapping("/usr/member")
+@RequiredArgsConstructor
 public class UsrMemberController {
-	
-	private MemberService memberService;
-	private Req req;
-	
-	public UsrMemberController(MemberService memberService, Req req) {
-		this.memberService = memberService;
-		this.req = req;
-	}
-	
-	@GetMapping("/usr/member/join")
-	public String join() {
-		return "usr/member/join";
-	}
-	
-	@PostMapping("/usr/member/doJoin")
-	@ResponseBody
-	public String doJoin(String loginId, String loginPw, String name) {
 
-		this.memberService.joinMember(loginId, Util.encryptSHA256(loginPw), name);
-		
-		return Util.jsReplace(String.format("%s님의 가입이 완료되었습니다", loginId), "login");
-	}
-	
-	@GetMapping("/usr/member/loginIdDupChk")
-	@ResponseBody
-	public ResultData loginIdDupChk(String loginId) {
-		
-		Member member = this.memberService.getMemberByLoginId(loginId);
-		
-		if (member != null) {
-			return new ResultData<>("F-1", String.format("[ %s ]은(는) 이미 사용중인 아이디입니다", loginId));
-		}
-		return new ResultData<>("S-1", String.format("[ %s ]은(는) 사용 가능한 아이디입니다", loginId));
-	}
-	
-	@GetMapping("/usr/member/login")
-	public String login() {
-		return "usr/member/login";
-	}
-	
-	@PostMapping("/usr/member/validLoginInfo")
-	@ResponseBody
-	public ResultData<Member> validLoginInfo(String loginId, String loginPw) {
-		
-		Member member = this.memberService.getMemberByLoginId(loginId);
-		
-		if (member == null) {
-			return new ResultData<>("F-1", String.format("[ %s ]은(는) 존재하지 않는 아이디입니다", loginId));
-		}
-		
-		if (!member.getLoginPw().equals(Util.encryptSHA256(loginPw))) {
-			return new ResultData<>("F-2", "비밀번호가 일치하지 않습니다");
-		}
-		
-		return new ResultData<>("S-1", "로그인 가능", member);
-	}
-	
-	@PostMapping("/usr/member/doLogin")
-	@ResponseBody
-	public String doLogin(int loginedMemberId, int loginedMemberAuthLevel, String loginId) {
-		
-		this.req.login(new LoginedMember(loginedMemberId, loginedMemberAuthLevel));
-		
-		return Util.jsReplace(String.format("[ %s ] 님 환영합니다~!", loginId), "/");
-	}
-	
-	@GetMapping("/usr/member/logout")
-	@ResponseBody
-	public String logout() {
-		
-		this.req.logout();
-		
-		return Util.jsReplace("정상적으로 로그아웃 되었습니다", "/");
-	}
-	
-	@GetMapping("/usr/member/getLoginId")
-	@ResponseBody
-	public String getLoginId() {
-		return this.memberService.getLoginId(this.req.getLoginedMember().getId());
-	}
+    private final MemberService memberService;
+
+    // 회원가입 페이지 이동
+    @GetMapping("/join")
+    public String showJoin() {
+        return "usr/member/join";
+    }
+
+    // 회원가입 처리 (동기 방식)
+    @PostMapping("/doJoin")
+    public String doJoin(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String name,
+            @RequestParam String nickname,
+            @RequestParam int age,
+            @RequestParam String region,
+            @RequestParam int dailyTarget
+    ) {
+        memberService.join(username, password, name, nickname, age, region, dailyTarget);
+        return "redirect:/login?msg=Welcome"; // 가입 후 로그인 페이지로 이동
+    }
+
+    // 아이디 중복 체크 (비동기 AJAX)
+    @GetMapping("/checkUsername")
+    @ResponseBody
+    public Map<String, Object> checkUsername(@RequestParam String username) {
+        Map<String, Object> response = new HashMap<>();
+        boolean exists = memberService.isUsernameTaken(username);
+        response.put("result", exists ? "fail" : "success");
+        return response;
+    }
+
+    // 닉네임 중복 체크 (비동기 AJAX)
+    @GetMapping("/checkNickname")
+    @ResponseBody
+    public Map<String, Object> checkNickname(@RequestParam String nickname) {
+        Map<String, Object> response = new HashMap<>();
+        boolean exists = memberService.isNicknameTaken(nickname);
+        response.put("result", exists ? "fail" : "success");
+        return response;
+    }
 }

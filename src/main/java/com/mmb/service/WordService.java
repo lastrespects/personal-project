@@ -1,36 +1,79 @@
-// WordService.java
 package com.mmb.service;
 
-import com.mmb.domain.Word; // 패키지 변경
-import com.mmb.repository.WordRepository; // 패키지 변경
+import com.mmb.api.DictionaryApiClient;
+import com.mmb.api.DictionaryApiClient.DictionaryWordInfo;
+import com.mmb.api.DeepLTranslationClient;
+import com.mmb.api.RandomWordClient;
+import com.mmb.entity.StudyRecord;
+import com.mmb.entity.Word;
+import com.mmb.repository.StudyRecordRepository;
+import com.mmb.repository.WordRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class WordService {
 
     private final WordRepository wordRepository;
-    // private final DictionaryApiClient dictionaryApiClient; // 외부 API 클라이언트는 구조에서 제외
+    private final StudyRecordRepository studyRecordRepository;
+    private final RandomWordClient randomWordClient;
+    private final DictionaryApiClient dictionaryApiClient;
+    private final DeepLTranslationClient translationClient;
+
+    @PostConstruct
+    @Transactional
+    public void initTestData() {
+        if (wordRepository.count() == 0) {
+            fetchAndSaveMockWords(30);
+        }
+    }
 
     @Transactional
-    public Optional<Word> findOrCreate(String spelling) {
-        Optional<Word> existing = wordRepository.findBySpelling(spelling);
-        if (existing.isPresent()) {
-            return existing;
+    public void fetchAndSaveMockWords(int count) {
+        List<String> randomWords = randomWordClient.getRandomWords(count);
+        if (randomWords.isEmpty()) {
+            System.out.println("[WordService] 랜덤 단어를 가져오지 못했습니다.");
+            return;
         }
 
-        // TODO: 실제로는 DictionaryApiClient를 사용하여 단어를 가져오는 로직이 필요
-        // 현재는 더미 데이터로 대체하거나 API 연동 코드를 추가해야 함.
-        Word newWord = Word.builder()
-                .spelling(spelling)
-                .meaning("더미 의미: " + spelling)
-                .exampleSentence("더미 예문: " + spelling + " is a new word.")
-                .audioPath("dummy/path")
-                .build();
-        return Optional.of(wordRepository.save(newWord));
+        for (String rawWord : randomWords) {
+            String w = rawWord.trim();
+            if (w.isEmpty()) continue;
+
+            if (wordRepository.existsBySpelling(w)) {
+                continue;
+            }
+
+            DictionaryWordInfo info = dictionaryApiClient.fetchWordInfo(w);
+            if (info == null) continue;
+
+            String englishDef = info.getDefinition();
+            String korean = translationClient.translateEnToKo(englishDef);
+            if (korean == null || korean.isBlank()) korean = englishDef;
+
+            Word entity = Word.builder()
+                    .spelling(info.getSpelling())
+                    .meaning(korean)
+                    .exampleSentence(info.getExample())
+                    .audioPath(info.getAudioUrl())
+                    .build();
+
+            wordRepository.save(entity);
+        }
+    }
+
+    public List<Word> findAllWords() {
+        return wordRepository.findAll();
+    }
+
+    @Transactional
+    public List<StudyRecord> getDailyQuizWords(Long memberId) {
+        return studyRecordRepository.findByMemberIdWithWord(memberId);
     }
 }

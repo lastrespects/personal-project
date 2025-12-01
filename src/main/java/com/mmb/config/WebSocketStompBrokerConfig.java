@@ -1,4 +1,3 @@
-// WebSocketStompBrokerConfig.java
 package com.mmb.config;
 
 import org.springframework.context.annotation.Configuration;
@@ -12,16 +11,15 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketStompBrokerConfig implements WebSocketMessageBrokerConfigurer {
 	
 	@Override
-    public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws-stomp")
-                .setAllowedOriginPatterns("http://localhost:*")
-                .withSockJS();
-    }
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/ws-stomp")
+                .setAllowedOriginPatterns("http://localhost:*")
+                .withSockJS();
+    }
 
-    @Override
-    public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/sub");
-
-        registry.setApplicationDestinationPrefixes("/pub");
-    }
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry registry) {
+        registry.enableSimpleBroker("/sub");
+        registry.setApplicationDestinationPrefixes("/pub");
+    }
 }

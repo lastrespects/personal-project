@@ -1,4 +1,3 @@
-// Req.java (세션 관리 객체)
 package com.mmb.dto;
 
 import java.io.IOException;
@@ -7,7 +6,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
-import com.mmb.util.Util; // 패키지 변경
+import com.mmb.util.Util; 
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,11 +26,11 @@ public class Req {
 	public Req(HttpServletRequest request, HttpServletResponse response) {
 		
 		this.resp = response;
-		
 		this.session = request.getSession();
 		
-		this.loginedMember = (LoginedMember) this.session.getAttribute("loginedMember"); 
+		this.loginedMember = (LoginedMember) this.session.getAttribute("loginedMember");
 
+		// LoginedMember가 null일 경우, 비로그인 상태를 나타내는 객체로 초기화
 		if (this.loginedMember == null) {
 			this.loginedMember = new LoginedMember();
 		}

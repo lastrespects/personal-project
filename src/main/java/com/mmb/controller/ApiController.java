@@ -1,4 +1,3 @@
-// ApiController.java
 package com.mmb.controller;
 
 import java.util.List;
@@ -28,20 +27,21 @@ public class ApiController {
 		String url = "apis.data.go.kr/6300000/mdlcnst/getmdlcnst";
 
 		Map<String, Object> response =
-	            this.webClient.get()
-	                    .uri(uriBuilder -> uriBuilder
-	                        .path(url)
-	                        .queryParam("serviceKey", this.apiKey)
-	                        .queryParam("numOfRows", 10)
-	                        .queryParam("pageNo", 1)
-	                        .build())
-	                    .retrieve()
-	                    .bodyToMono(Map.class)
-	                    .block();
+            this.webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                    .path(url)
+                    .queryParam("serviceKey", this.apiKey)
+                    .queryParam("numOfRows", 10)
+                    .queryParam("pageNo", 1)
+                    .build())
+                .retrieve()
+                .bodyToMono(Map.class)
+                .block();
 		
-		List<Map<String, Object>> items =
-	            (List<Map<String, Object>>)
-	            ((Map<String, Object>) ((Map<String, Object>) response.get("response")).get("body")).get("items");
+		// List<Map<String, Object>> items 캐스팅 구문 수정
+        Map<String, Object> responseMap = (Map<String, Object>) response.get("response");
+        Map<String, Object> bodyMap = (Map<String, Object>) responseMap.get("body");
+		List<Map<String, Object>> items = (List<Map<String, Object>>) bodyMap.get("items");
 		
 		model.addAttribute("mdlcnst", items);
 

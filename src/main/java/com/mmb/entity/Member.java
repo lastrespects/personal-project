@@ -6,7 +6,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "member") // 실제 테이블명이 member 라고 가정
+@Table(name = "member")
 @Getter
 @Setter
 @Builder
@@ -25,37 +25,50 @@ public class Member {
     @Column(nullable = false)
     private LocalDateTime updateDate;
 
-    // loginId 컬럼과 매핑 (MyBatis 쪽과 호환)
-    @Column(name = "loginId", unique = true, nullable = false)
-    private String username;
+    // DB 컬럼: username VARCHAR(50) UNIQUE NOT NULL
+    @Column(length = 50, nullable = false, unique = true)
+    private String username;   // 로그인 ID
 
-    // loginPw 컬럼과 매핑
-    @Column(name = "loginPw", nullable = false)
-    private String password;
+    // DB 컬럼: PASSWORD VARCHAR(255) NOT NULL (대문자 주의)
+    @Column(name = "PASSWORD", length = 255, nullable = false)
+    private String password;   // BCrypt 암호화된 비밀번호
 
-    // name 컬럼과 매핑
-    @Column(name = "name", nullable = false)
-    private String realName;
+    // DB 컬럼: realName VARCHAR(20) NOT NULL
+    @Column(length = 20, nullable = false)
+    private String realName;   // 실명
 
-    @Column(unique = true, nullable = false)
-    private String nickname;
+    // DB 컬럼: nickname VARCHAR(50) UNIQUE NOT NULL
+    @Column(length = 50, nullable = false, unique = true)
+    private String nickname;   // 닉네임
 
+    // DB 컬럼: age INT UNSIGNED DEFAULT 0
     private Integer age;
+
+    // DB 컬럼: region VARCHAR(20)
+    @Column(length = 20)
     private String region;
 
-    // 하루 목표 단어 수
-    private Integer dailyTarget;
+    // DB 컬럼: dailyTarget INT UNSIGNED DEFAULT 30
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer dailyTarget = 30;   // 하루 목표 단어 수
 
-    // 권한 레벨 (예: 1=관리자, 3=일반회원 등)
-    private Integer authLevel;
+    // DB 컬럼: authLevel INT UNSIGNED NOT NULL DEFAULT 3
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer authLevel = 3;      // 권한 레벨 (0=관리자, 3=일반)
 
-    // 게임 요소: 캐릭터 레벨/경험치/마지막 힌트 사용일
+    // ====== 게임 요소: 아직 DB 컬럼 없음 → @Transient 로 메모리에서만 사용 ======
+
+    @Transient
     @Builder.Default
     private Integer characterLevel = 1;
 
+    @Transient
     @Builder.Default
     private Integer currentExp = 0;
 
+    @Transient
     private String lastHintDate;
 
     // ====== 라이프사이클 콜백 ======
@@ -67,10 +80,10 @@ public class Member {
         this.updateDate = now;
 
         if (this.dailyTarget == null) {
-            this.dailyTarget = 30;   // 기본 하루 목표
+            this.dailyTarget = 30;
         }
         if (this.authLevel == null) {
-            this.authLevel = 3;      // 기본 권한 레벨(예: 일반 회원)
+            this.authLevel = 3;
         }
         if (this.characterLevel == null) {
             this.characterLevel = 1;
@@ -97,5 +110,10 @@ public class Member {
             this.characterLevel++;
             this.currentExp -= 100;
         }
+    }
+
+    // 관리자 체크 편의 메서드
+    public boolean isAdmin() {
+        return this.authLevel != null && this.authLevel == 0;
     }
 }

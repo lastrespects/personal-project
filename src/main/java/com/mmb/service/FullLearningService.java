@@ -1,3 +1,4 @@
+// src/main/java/com/mmb/service/FullLearningService.java
 package com.mmb.service;
 
 import com.google.gson.Gson;
@@ -33,8 +34,9 @@ public class FullLearningService {
 
         int dailyTarget = member.getDailyTarget();
 
+        // 🔹 여기서 Long 캐스팅이 핵심
         List<StudyRecord> todayReviews =
-                studyRecordRepository.findTodayReviews(memberId, LocalDate.now());
+                studyRecordRepository.findTodayReviews((long) memberId, LocalDate.now());
 
         int remaining = Math.max(0, dailyTarget - todayReviews.size());
 
@@ -44,7 +46,7 @@ public class FullLearningService {
         for (StudyRecord sr : todayReviews) {
             StudyRecordDto dto = new StudyRecordDto();
             dto.setId(sr.getId());
-            // WordDto 매핑은 나중에
+            // TODO: WordDto / 단어 정보 매핑은 나중에 추가
             quiz.add(dto);
         }
 

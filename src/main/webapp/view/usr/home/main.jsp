@@ -1,12 +1,15 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+         pageEncoding="UTF-8"%>
+
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>메인 - My Memory Book</title>
+    <meta charset="UTF-8">
+    <title>메인 - My Memory Book</title>
 </head>
 <body>
-    <h1>🏠 메인 로비</h1>
+
+<h1 style="color:red;">★ 여기가 진짜 메인 JSP 입니다 ★</h1>
     
     <!-- 내 캐릭터 영역 -->
     <div style="border:1px solid black; padding:10px; width:220px; display:inline-block; vertical-align:top;">

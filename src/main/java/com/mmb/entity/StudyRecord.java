@@ -34,15 +34,15 @@ public class StudyRecord {
 
     @Column(nullable = false)
     @Builder.Default
-    private Integer correctCount = 0;     // 정답 횟수
+    private Integer correctCount = 0; // 정답 횟수
 
     @Column(nullable = false)
     @Builder.Default
-    private Integer incorrectCount = 0;   // 오답 횟수
+    private Integer incorrectCount = 0; // 오답 횟수
 
     @Column(nullable = false)
     @Builder.Default
-    private Integer totalAttempts = 0;    // 총 시도 횟수
+    private Integer totalAttempts = 0; // 총 시도 횟수
 
     private LocalDateTime lastReviewDate; // 마지막 학습 일시
 
@@ -55,17 +55,23 @@ public class StudyRecord {
         if (this.lastReviewDate == null) {
             this.lastReviewDate = now;
         }
-        if (this.correctCount == null) this.correctCount = 0;
-        if (this.incorrectCount == null) this.incorrectCount = 0;
-        if (this.totalAttempts == null) this.totalAttempts = 0;
+        if (this.correctCount == null)
+            this.correctCount = 0;
+        if (this.incorrectCount == null)
+            this.incorrectCount = 0;
+        if (this.totalAttempts == null)
+            this.totalAttempts = 0;
     }
 
     // ====== SRS용 편의 메서드 ======
 
     public void recordResult(boolean isCorrect) {
-        if (totalAttempts == null) totalAttempts = 0;
-        if (correctCount == null) correctCount = 0;
-        if (incorrectCount == null) incorrectCount = 0;
+        if (totalAttempts == null)
+            totalAttempts = 0;
+        if (correctCount == null)
+            correctCount = 0;
+        if (incorrectCount == null)
+            incorrectCount = 0;
 
         totalAttempts++;
         if (isCorrect) {

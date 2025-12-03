@@ -1,7 +1,9 @@
 // src/main/java/com/mmb/dto/learning/LearningResultRequest.java
-package com.mmb.dto.learning;
+package com.mmb.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor

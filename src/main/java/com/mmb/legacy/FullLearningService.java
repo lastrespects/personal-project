@@ -1,11 +1,14 @@
 // src/main/java/com/mmb/service/FullLearningService.java
-package com.mmb.service;
+package com.mmb.legacy;
 
 import com.google.gson.Gson;
-import com.mmb.dto.StudyRecordDto;
 import com.mmb.entity.Member;
 import com.mmb.entity.StudyRecord;
 import com.mmb.repository.StudyRecordRepository;
+import com.mmb.service.LikePointService;
+import com.mmb.service.MemberService;
+import com.mmb.service.WordService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,18 +1,22 @@
 // src/main/java/com/mmb/service/learning/LearningServiceImpl.java
-package com.mmb.service.learning;
+package com.mmb.service;
 
-import com.mmb.dto.learning.TodayWordDto;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.mmb.dto.TodayWordDto;
 import com.mmb.entity.Member;
 import com.mmb.entity.StudyRecord;
 import com.mmb.entity.Word;
 import com.mmb.repository.MemberRepository;
 import com.mmb.repository.StudyRecordRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.*;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -147,9 +151,12 @@ public class LearningServiceImpl implements LearningService {
         LocalDateTime dateA = a.getLastReviewDate();
         LocalDateTime dateB = b.getLastReviewDate();
 
-        if (dateA == null && dateB != null) return -1;
-        if (dateA != null && dateB == null) return 1;
-        if (dateA == null) return 0;
+        if (dateA == null && dateB != null)
+            return -1;
+        if (dateA != null && dateB == null)
+            return 1;
+        if (dateA == null)
+            return 0;
 
         return dateA.compareTo(dateB);
     }

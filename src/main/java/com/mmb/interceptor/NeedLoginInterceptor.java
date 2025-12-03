@@ -11,13 +11,13 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class NeedLoginInterceptor implements HandlerInterceptor {
-	
+
 	private Req req;
-	
+
 	public NeedLoginInterceptor(Req req) {
 		this.req = req;
 	}
-	
+
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
@@ -26,8 +26,8 @@ public class NeedLoginInterceptor implements HandlerInterceptor {
 			this.req.jsPrintReplace("로그인 후 이용해주세요", "/usr/member/login");
 			return false;
 		}
-		
+
 		return HandlerInterceptor.super.preHandle(request, response, handler);
 	}
-	
+
 }

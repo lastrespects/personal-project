@@ -27,19 +27,19 @@ public class Member {
 
     // DB 컬럼: username VARCHAR(50) UNIQUE NOT NULL
     @Column(length = 50, nullable = false, unique = true)
-    private String username;   // 로그인 ID
+    private String username; // 로그인 ID
 
     // DB 컬럼: PASSWORD VARCHAR(255) NOT NULL (대문자 주의)
     @Column(name = "PASSWORD", length = 255, nullable = false)
-    private String password;   // BCrypt 암호화된 비밀번호
+    private String password; // BCrypt 암호화된 비밀번호
 
     // DB 컬럼: realName VARCHAR(20) NOT NULL
     @Column(length = 20, nullable = false)
-    private String realName;   // 실명
+    private String realName; // 실명
 
     // DB 컬럼: nickname VARCHAR(50) UNIQUE NOT NULL
     @Column(length = 50, nullable = false, unique = true)
-    private String nickname;   // 닉네임
+    private String nickname; // 닉네임
 
     // DB 컬럼: age INT UNSIGNED DEFAULT 0
     private Integer age;
@@ -51,12 +51,12 @@ public class Member {
     // DB 컬럼: dailyTarget INT UNSIGNED DEFAULT 30
     @Column(nullable = false)
     @Builder.Default
-    private Integer dailyTarget = 30;   // 하루 목표 단어 수
+    private Integer dailyTarget = 30; // 하루 목표 단어 수
 
     // DB 컬럼: authLevel INT UNSIGNED NOT NULL DEFAULT 3
     @Column(nullable = false)
     @Builder.Default
-    private Integer authLevel = 3;      // 권한 레벨 (0=관리자, 3=일반)
+    private Integer authLevel = 3; // 권한 레벨 (0=관리자, 3=일반)
 
     // ====== 게임 요소: 아직 DB 컬럼 없음 → @Transient 로 메모리에서만 사용 ======
 
@@ -100,10 +100,13 @@ public class Member {
 
     // ====== 경험치 획득 메서드 ======
     public void gainExp(int exp) {
-        if (exp <= 0) return;
+        if (exp <= 0)
+            return;
 
-        if (this.currentExp == null) this.currentExp = 0;
-        if (this.characterLevel == null) this.characterLevel = 1;
+        if (this.currentExp == null)
+            this.currentExp = 0;
+        if (this.characterLevel == null)
+            this.characterLevel = 1;
 
         this.currentExp += exp;
         while (this.currentExp >= 100) {

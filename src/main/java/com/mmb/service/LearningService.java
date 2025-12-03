@@ -1,9 +1,9 @@
 // src/main/java/com/mmb/service/learning/LearningService.java
-package com.mmb.service.learning;
-
-import com.mmb.dto.learning.TodayWordDto;
+package com.mmb.service;
 
 import java.util.List;
+
+import com.mmb.dto.TodayWordDto;
 
 public interface LearningService {
 

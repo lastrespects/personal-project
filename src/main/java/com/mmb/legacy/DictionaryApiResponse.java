@@ -1,4 +1,4 @@
-package com.mmb.dto;
+package com.mmb.legacy;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,5 +1,12 @@
 // src/main/java/com/mmb/service/learning/WordGenerationServiceImpl.java
-package com.mmb.service.learning;
+package com.mmb.service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.mmb.api.DictionaryApiClient;
 import com.mmb.api.DictionaryResponse;
@@ -8,11 +15,8 @@ import com.mmb.api.TranslationClient;
 import com.mmb.entity.Member;
 import com.mmb.entity.Word;
 import com.mmb.repository.WordRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor

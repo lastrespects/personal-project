@@ -44,18 +44,21 @@ public class WordService {
 
         for (String rawWord : randomWords) {
             String w = rawWord.trim();
-            if (w.isEmpty()) continue;
+            if (w.isEmpty())
+                continue;
 
             if (wordRepository.existsBySpelling(w)) {
                 continue;
             }
 
             DictionaryWordInfo info = dictionaryApiClient.fetchWordInfo(w);
-            if (info == null) continue;
+            if (info == null)
+                continue;
 
             String englishDef = info.getDefinition();
             String korean = translationClient.translateEnToKo(englishDef);
-            if (korean == null || korean.isBlank()) korean = englishDef;
+            if (korean == null || korean.isBlank())
+                korean = englishDef;
 
             Word entity = Word.builder()
                     .spelling(info.getSpelling())

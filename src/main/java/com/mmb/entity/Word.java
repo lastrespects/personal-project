@@ -23,16 +23,16 @@ public class Word {
     private LocalDateTime updateDate;
 
     @Column(length = 100, nullable = false)
-    private String spelling;   // 단어 철자
+    private String spelling; // 단어 철자
 
     @Column(length = 255, nullable = false)
-    private String meaning;    // 한국어 뜻 (DeepL 번역 결과)
+    private String meaning; // 한국어 뜻 (DeepL 번역 결과)
 
     @Lob
     private String exampleSentence; // 예문
 
     @Column(length = 255)
-    private String audioPath;  // TTS 오디오 or 사전 음성 URL
+    private String audioPath; // TTS 오디오 or 사전 음성 URL
 
     @PrePersist
     public void onCreate() {

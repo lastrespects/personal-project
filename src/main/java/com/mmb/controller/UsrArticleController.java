@@ -48,16 +48,15 @@ public class UsrArticleController {
 
         return Util.jsReplace(
                 String.format("%d번 게시물이 작성되었습니다", id),
-                String.format("detail?id=%d", id)
-        );
+                String.format("detail?id=%d", id));
     }
 
     @GetMapping("/usr/article/list")
     public String list(Model model,
-                       int boardId,
-                       @RequestParam(defaultValue = "1") int cPage,
-                       @RequestParam(defaultValue = "") String searchKeyword,
-                       String searchType) {
+            int boardId,
+            @RequestParam(defaultValue = "1") int cPage,
+            @RequestParam(defaultValue = "") String searchKeyword,
+            String searchType) {
 
         int itemsInAPage = 10;
         int limitFrom = (cPage - 1) * itemsInAPage;
@@ -71,8 +70,8 @@ public class UsrArticleController {
             end = totalPagesCnt;
         }
 
-        List<Article> articles =
-                this.articleService.showList(boardId, limitFrom, itemsInAPage, searchType, searchKeyword.trim());
+        List<Article> articles = this.articleService.showList(boardId, limitFrom, itemsInAPage, searchType,
+                searchKeyword.trim());
         String boardName = this.boardService.getBoardNameById(boardId);
 
         model.addAttribute("articles", articles);
@@ -88,9 +87,9 @@ public class UsrArticleController {
 
     @GetMapping("/usr/article/detail")
     public String detail(HttpServletRequest request,
-                         HttpServletResponse response,
-                         Model model,
-                         int id) {
+            HttpServletResponse response,
+            Model model,
+            int id) {
 
         Cookie[] cookies = request.getCookies();
         boolean isViewed = false;
@@ -134,8 +133,7 @@ public class UsrArticleController {
 
         return Util.jsReplace(
                 String.format("%d번 게시물의 수정이 완료되었습니다", id),
-                String.format("detail?id=%d", id)
-        );
+                String.format("detail?id=%d", id));
     }
 
     @GetMapping("/usr/article/delete")
@@ -146,7 +144,6 @@ public class UsrArticleController {
 
         return Util.jsReplace(
                 String.format("%d번 게시물이 삭제되었습니다", id),
-                String.format("list?boardId=%d", boardId)
-        );
+                String.format("list?boardId=%d", boardId));
     }
 }

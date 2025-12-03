@@ -1,9 +1,10 @@
 // src/main/java/com/mmb/controller/LearningController.java
 package com.mmb.controller;
 
-import com.mmb.dto.learning.LearningResultRequest;
-import com.mmb.dto.learning.TodayWordDto;
-import com.mmb.service.learning.LearningService;
+import com.mmb.dto.LearningResultRequest;
+import com.mmb.dto.TodayWordDto;
+import com.mmb.service.LearningService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

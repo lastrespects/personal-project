@@ -33,7 +33,7 @@ public class UsrHomeController {
 
         // 🔹 공지사항 최신 3개만 메인에 띄워주기
         int noticeBoardId = 1;
-        var notices = articleService.findLatestArticles(noticeBoardId, 3); 
+        var notices = articleService.findLatestArticles(noticeBoardId, 3);
         // ↑ 이 메서드는 강사님 list 로직을 응용해서 직접 만들면 됨 (예: boardId + limit로 조회)
         model.addAttribute("notices", notices);
 

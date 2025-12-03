@@ -1,10 +1,10 @@
 // src/main/java/com/mmb/service/learning/WordGenerationService.java
-package com.mmb.service.learning;
+package com.mmb.service;
+
+import java.util.List;
 
 import com.mmb.entity.Member;
 import com.mmb.entity.Word;
-
-import java.util.List;
 
 public interface WordGenerationService {
 

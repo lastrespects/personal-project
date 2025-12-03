@@ -1,11 +1,13 @@
 // StudyRecordDto.java
-package com.mmb.dto;
+package com.mmb.legacy;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+
+import com.mmb.dto.WordDto;
 
 @Data
 @AllArgsConstructor

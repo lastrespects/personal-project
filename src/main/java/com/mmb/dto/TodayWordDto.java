@@ -1,7 +1,10 @@
 // src/main/java/com/mmb/dto/learning/TodayWordDto.java
-package com.mmb.dto.learning;
+package com.mmb.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor

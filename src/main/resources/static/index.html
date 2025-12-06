@@ -30,29 +30,28 @@
 <body>
 
 <div class="container">
-    <h1>📝 오늘의 단어 학습 퀴즈 (30개)</h1>
-    <p id="member-info">사용자 ID: 1 (임시)</p>
+    <h1>오늘의 단어 학습 퀴즈 (30개)</h1>
+    <p id="member-info">사용자ID: 1 (예시)</p>
     
     <div class="error" id="error-message"></div>
 
     <h2>단어 목록</h2>
     <ul id="quiz-list">
-        <li>로딩 중...</li>
+        <li>로드 중...</li>
     </ul>
 
     </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // 회원 ID는 Postman에서 받은 ID로 수정해야 합니다 (예: 1)
         const memberId = 1; 
-        const quizStartUrl = `http://localhost:8080/api/start/${memberId}`;
+        const quizStartUrl = `http://localhost:8081/api/start/${memberId}`;
         
         const quizListElement = document.getElementById('quiz-list');
         const errorElement = document.getElementById('error-message');
         const memberInfoElement = document.getElementById('member-info');
 
-        memberInfoElement.textContent = `사용자 ID: ${memberId}`;
+        memberInfoElement.textContent = `사용자ID: ${memberId}`;
 
         fetch(quizStartUrl)
             .then(response => {
@@ -68,46 +67,40 @@
                 quizData.forEach(item => { 
                     const listItem = document.createElement('li');
                     
-                    // StudyRecord 객체(item) 안의 Word 객체(item.word)에 접근
                     if (item.word) {
                         const spelling = item.word.spelling;
                         const meaning = item.word.meaning;
                         const example = item.word.exampleSentence;
                         const audio = item.word.audioPath;
 
-                        // 텍스트 표시
-                        const textContent = `${spelling}: ${meaning} (예문: ${example})`;
+                        const textContent = `${spelling}: ${meaning} (예문: ${example || '예문 준비중'})`;
                         const textSpan = document.createElement('span');
                         textSpan.textContent = textContent;
                         listItem.appendChild(textSpan);
 
-                        // 오디오 버튼 추가
-                        // audio가 유효한 URL일 때만 버튼 표시
-                        if (audio && audio.startsWith('http')) { 
-                            const audioBtn = document.createElement('button');
-                            audioBtn.textContent = '🔊 듣기';
-                            audioBtn.onclick = () => {
-                                // 새 Audio 객체를 생성하여 재생
+                        const audioBtn = document.createElement('button');
+                        audioBtn.textContent = '발음 듣기';
+                        audioBtn.onclick = () => {
+                            if (audio && audio.startsWith('http')) {
                                 new Audio(audio).play().catch(e => console.error("Audio playback failed:", e));
-                            };
-                            listItem.appendChild(audioBtn);
-                        } else {
-                            // 오디오가 없는 단어임을 표시
-                            const noAudio = document.createElement('span');
-                            noAudio.textContent = ' (음성 X)';
-                            noAudio.style.color = '#888';
-                            listItem.appendChild(noAudio);
-                        }
+                            } else if ('speechSynthesis' in window) {
+                                const utter = new SpeechSynthesisUtterance(spelling);
+                                utter.lang = 'en-US';
+                                window.speechSynthesis.speak(utter);
+                            } else {
+                                alert('브라우저에서 음성 합성이 지원되지 않습니다.');
+                            }
+                        };
+                        listItem.appendChild(audioBtn);
                     } else {
-                        listItem.textContent = '❗ 단어 데이터 로드 오류';
+                        listItem.textContent = '단어 데이터 로드 실패';
                     }
 
                     quizListElement.appendChild(listItem);
                 });
             })
             .catch(error => {
-                // Postman에서 500 에러를 받았을 때도 여기로 넘어옵니다.
-                errorElement.textContent = '💥 서버 통신 또는 데이터 로드 중 오류 발생: ' + error.message;
+                errorElement.textContent = '서버 통신 또는 데이터 로드 오류 발생: ' + error.message;
                 console.error('Fetch Error:', error);
             });
     });

@@ -34,6 +34,21 @@ public class Word {
     @Column(length = 255)
     private String audioPath; // TTS 오디오 or 사전 음성 URL
 
+    // getter for definition (alias for meaning)
+    public String getDefinition() {
+        return this.meaning;
+    }
+
+    // getter for example (alias for exampleSentence)
+    public String getExample() {
+        return this.exampleSentence;
+    }
+
+    // getter for audioUrl (alias for audioPath)
+    public String getAudioUrl() {
+        return this.audioPath;
+    }
+
     @PrePersist
     public void onCreate() {
         this.regDate = LocalDateTime.now();

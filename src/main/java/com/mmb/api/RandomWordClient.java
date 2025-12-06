@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -18,6 +17,12 @@ public class RandomWordClient {
     private String randomWordBaseUrl;
 
     public List<String> getRandomWords(int count) {
+        List<String> fallback = List.of(
+                "apple", "study", "language", "computer", "spring",
+                "coffee", "music", "travel", "friend", "project",
+                "planet", "library", "notebook", "pencil", "memory",
+                "ocean", "mountain", "river", "forest", "future"
+        );
         try {
             List<String> words = webClient.get()
                     .uri(randomWordBaseUrl + "/api?words=" + count)
@@ -25,13 +30,13 @@ public class RandomWordClient {
                     .bodyToMono(List.class)
                     .block();
 
-            if (words == null) {
-                return Collections.emptyList();
+            if (words == null || words.isEmpty()) {
+                return fallback;
             }
             return words;
         } catch (Exception e) {
             System.err.println("[RandomWordClient] 단어 가져오기 실패: " + e.getMessage());
-            return Collections.emptyList();
+            return fallback;
         }
     }
 }

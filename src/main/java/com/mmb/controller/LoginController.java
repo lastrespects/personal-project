@@ -1,4 +1,4 @@
-package com.mmb.controller;
+﻿package com.mmb.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,6 +7,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class LoginController {
     @GetMapping("/login")
     public String login() {
-        return "usr/member/login"; // 경로 확인 필요 (src/main/webapp/view/usr/member/login.jsp)
+        return "usr/member/login"; // 寃쎈줈 ?뺤씤 ?꾩슂 (src/main/webapp/view/usr/member/login.jsp)
+    }
+    @GetMapping("/usr/member/login")
+    public String legacyLogin() {
+        return "redirect:/login";
     }
 }
+

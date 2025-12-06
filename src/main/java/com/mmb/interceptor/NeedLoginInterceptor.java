@@ -22,12 +22,18 @@ public class NeedLoginInterceptor implements HandlerInterceptor {
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
 
-		if (this.req.getLoginedMember().getId() == 0) {
-			this.req.jsPrintReplace("로그인 후 이용해주세요", "/usr/member/login");
-			return false;
+		// Spring Security 로그인 여부 우선 체크
+		if (request.getUserPrincipal() != null) {
+			return HandlerInterceptor.super.preHandle(request, response, handler);
 		}
 
-		return HandlerInterceptor.super.preHandle(request, response, handler);
+		// 세션에 별도로 심어 둔 loginedMember 기준 체크
+		if (this.req.getLoginedMember() != null && this.req.getLoginedMember().getId() != 0) {
+			return HandlerInterceptor.super.preHandle(request, response, handler);
+		}
+
+		this.req.jsPrintReplace("로그인 후 이용해주세요", "/login");
+		return false;
 	}
 
 }

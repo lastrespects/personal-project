@@ -24,22 +24,46 @@ public interface ArticleDao {
                       @Param("memberId") int memberId,
                       @Param("boardId") int boardId);
 
-    // 마지막 AUTO_INCREMENT id
     @Select("SELECT LAST_INSERT_ID()")
     int getLastInsertId();
 
-    // 게시글 개수 (일단 boardId 기준만, 검색은 나중에)
+    // 게시글 개수 (boardId + 검색어 적용)
     @Select("""
+            <script>
             SELECT COUNT(*)
             FROM article a
             WHERE a.boardId = #{boardId}
+            <if test="searchKeyword != null and searchKeyword != ''">
+                <choose>
+                    <when test="searchType == 'title'">
+                        AND a.title LIKE CONCAT('%', #{searchKeyword}, '%')
+                    </when>
+                    <when test="searchType == 'content'">
+                        AND a.content LIKE CONCAT('%', #{searchKeyword}, '%')
+                    </when>
+                    <when test="searchType == 'title,content'">
+                        AND (
+                            a.title LIKE CONCAT('%', #{searchKeyword}, '%')
+                            OR a.content LIKE CONCAT('%', #{searchKeyword}, '%')
+                        )
+                    </when>
+                    <otherwise>
+                        AND (
+                            a.title LIKE CONCAT('%', #{searchKeyword}, '%')
+                            OR a.content LIKE CONCAT('%', #{searchKeyword}, '%')
+                        )
+                    </otherwise>
+                </choose>
+            </if>
+            </script>
             """)
     int getArticlesCnt(@Param("boardId") int boardId,
                        @Param("searchType") String searchType,
                        @Param("searchKeyword") String searchKeyword);
 
-    // 게시글 목록 (boardId + 페이징만, 검색은 나중에)
+    // 게시글 목록 (boardId + 검색어 적용)
     @Select("""
+            <script>
             SELECT
                 a.id,
                 a.regDate,
@@ -54,6 +78,28 @@ public interface ArticleDao {
               ON l.relTypeCode = 'article'
              AND l.relId = a.id
             WHERE a.boardId = #{boardId}
+            <if test="searchKeyword != null and searchKeyword != ''">
+                <choose>
+                    <when test="searchType == 'title'">
+                        AND a.title LIKE CONCAT('%', #{searchKeyword}, '%')
+                    </when>
+                    <when test="searchType == 'content'">
+                        AND a.content LIKE CONCAT('%', #{searchKeyword}, '%')
+                    </when>
+                    <when test="searchType == 'title,content'">
+                        AND (
+                            a.title LIKE CONCAT('%', #{searchKeyword}, '%')
+                            OR a.content LIKE CONCAT('%', #{searchKeyword}, '%')
+                        )
+                    </when>
+                    <otherwise>
+                        AND (
+                            a.title LIKE CONCAT('%', #{searchKeyword}, '%')
+                            OR a.content LIKE CONCAT('%', #{searchKeyword}, '%')
+                        )
+                    </otherwise>
+                </choose>
+            </if>
             GROUP BY
                 a.id,
                 a.regDate,
@@ -62,6 +108,7 @@ public interface ArticleDao {
                 a.views
             ORDER BY a.id DESC
             LIMIT #{limitFrom}, #{itemsInAPage}
+            </script>
             """)
     List<Article> showList(@Param("boardId") int boardId,
                            @Param("limitFrom") int limitFrom,
@@ -69,7 +116,6 @@ public interface ArticleDao {
                            @Param("searchType") String searchType,
                            @Param("searchKeyword") String searchKeyword);
 
-    // 조회수 증가
     @Update("""
             UPDATE article
             SET views = views + 1,
@@ -78,7 +124,6 @@ public interface ArticleDao {
             """)
     void increaseViews(@Param("id") int id);
 
-    // 게시글 상세
     @Select("""
             SELECT
                 a.id,
@@ -111,7 +156,6 @@ public interface ArticleDao {
             """)
     Article getArticleById(@Param("id") int id);
 
-    // 게시글 수정
     @Update("""
             UPDATE article
             SET
@@ -124,7 +168,6 @@ public interface ArticleDao {
                        @Param("title") String title,
                        @Param("content") String content);
 
-    // 게시글 삭제
     @Delete("""
             DELETE FROM article
             WHERE id = #{id}

@@ -21,6 +21,10 @@ public interface StudyRecordRepository extends JpaRepository<StudyRecord, Long> 
     Optional<StudyRecord> findByMemberIdAndWordId(@Param("memberId") Long memberId,
                                                   @Param("wordId") Long wordId);
 
+    @Query("select count(s)>0 from StudyRecord s where s.member.id = :memberId and s.word.id = :wordId")
+    boolean existsByMemberIdAndWordId(@Param("memberId") Long memberId,
+                                      @Param("wordId") Long wordId);
+
     // 오늘 복습 기록 (FullLearningService에서 사용)
     @Query("""
            select s

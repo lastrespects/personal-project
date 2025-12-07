@@ -52,7 +52,7 @@ public class WordGenerationServiceImpl implements WordGenerationService {
                 continue;
             }
 
-            Optional<Word> existing = wordRepository.findBySpelling(spelling);
+            Optional<Word> existing = wordRepository.findFirstBySpellingIgnoreCase(spelling);
             if (existing.isPresent()) {
                 Word w = existing.get();
                 if (excludeWordIds.contains(w.getId())) {
@@ -106,7 +106,7 @@ public class WordGenerationServiceImpl implements WordGenerationService {
                 if (batchSpellings.contains(spelling)) {
                     continue;
                 }
-                Optional<Word> existing = wordRepository.findBySpelling(spelling);
+                Optional<Word> existing = wordRepository.findFirstBySpellingIgnoreCase(spelling);
                 if (existing.isPresent()) {
                     Word w = existing.get();
                     if (excludeWordIds.contains(w.getId())) {

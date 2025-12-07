@@ -8,8 +8,7 @@ import java.util.Optional;
 
 public interface WordRepository extends JpaRepository<Word, Long> {
 
-    Optional<Word> findBySpelling(String spelling);
+    Optional<Word> findFirstBySpellingIgnoreCase(String spelling);
 
-    // 추가
     boolean existsBySpelling(String spelling);
 }

@@ -49,7 +49,9 @@ public class DeepLTranslationClient implements TranslationClient {
                     return text;
                 }
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            System.err.println("DeepL API Error: " + e.getMessage());
+            e.printStackTrace();
         }
         return englishText;
     }

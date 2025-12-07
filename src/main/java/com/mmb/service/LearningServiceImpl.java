@@ -107,7 +107,8 @@ public class LearningServiceImpl implements LearningService {
             Set<Long> exclude = uniqMap.keySet();
             List<Word> extra = wordGenerationService.generateNewWordsForMember(member, stillNeed, exclude);
             for (Word w : extra) {
-                if (uniqMap.containsKey(w.getId())) continue;
+                if (uniqMap.containsKey(w.getId()))
+                    continue;
                 StudyRecord record = StudyRecord.builder()
                         .member(member)
                         .word(w)
@@ -127,7 +128,8 @@ public class LearningServiceImpl implements LearningService {
                         .audioPath(w.getAudioPath())
                         .review(false)
                         .build());
-                if (uniqMap.size() >= targetCount) break;
+                if (uniqMap.size() >= targetCount)
+                    break;
             }
         }
 
@@ -206,7 +208,7 @@ public class LearningServiceImpl implements LearningService {
         return dateA.compareTo(dateB);
     }
 
-        private String resolveMeaning(Word w) {
+    private String resolveMeaning(Word w) {
         String spelling = w.getSpelling() != null ? w.getSpelling() : "";
         String meaning = w.getMeaning();
 
@@ -234,13 +236,11 @@ public class LearningServiceImpl implements LearningService {
             }
         } catch (Exception ignored) {
         }
-        String fallback = hasMeaning ? meaning : spelling;
-        w.setMeaning(fallback);
-        wordRepository.save(w);
-        return fallback;
+        // 최후의 수단: 한글 뜻이 없으면 무조건 "(뜻 없음)" 반환
+        return "(뜻 없음)";
     }
 
-private String resolveExample(Word w) {
+    private String resolveExample(Word w) {
         String current = w.getExampleSentence();
         if (current != null && !current.isBlank() && !"null".equalsIgnoreCase(current)) {
             // 이미 해석이 붙어 있다면 그대로 반환
@@ -274,9 +274,9 @@ private String resolveExample(Word w) {
         }
         return exampleEn;
     }
+
 }
 
+    
 
-
-
-
+    

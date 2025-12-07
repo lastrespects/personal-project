@@ -21,24 +21,14 @@ CREATE TABLE study_record (
   regDate DATETIME NOT NULL,
   memberId INT UNSIGNED NOT NULL COMMENT '회원 ID',
   wordId INT UNSIGNED NOT NULL COMMENT '단어 ID',
-  totalAttempts INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '총 시도 횟수',
-  correctCount INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '정답 횟수',
-  incorrectCount INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '오답 횟수',
-  lastReviewDate DATETIME NULL COMMENT '마지막 학습 일시'
+  totalAttempts INT UNSIGNED NOT NULL DEFAULT 0,
+  correctCount INT UNSIGNED NOT NULL DEFAULT 0,
+  incorrectCount INT UNSIGNED NOT NULL DEFAULT 0,
+  lastReviewDate DATETIME NULL,
+  FOREIGN KEY (memberId) REFERENCES MEMBER(id) ON DELETE CASCADE,
+  FOREIGN KEY (wordId) REFERENCES word(id) ON DELETE CASCADE
 );
 
-
-# ARTICLE 테이블 (게시글)
-CREATE TABLE article(
-    id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT
-    , regDate DATETIME NOT NULL
-    , updateDate DATETIME NOT NULL
-    , memberId INT UNSIGNED NOT NULL
-    , title VARCHAR(100) NOT NULL
-    , content TEXT NOT NULL
-    , boardId INT UNSIGNED NOT NULL
-    , views INT UNSIGNED NOT NULL DEFAULT 0
-);
 
 # MEMBER 테이블 (수정 반영: email / 닉변 시각 / 탈퇴 관련 컬럼 포함)
 CREATE TABLE `member`(
@@ -65,22 +55,40 @@ CREATE TABLE board(
     , boardName VARCHAR(20) NOT NULL
 );
 
-# LIKE_POINT 테이블 (좋아요)
-CREATE TABLE likePoint(
-    memberId INT UNSIGNED NOT NULL
-    , relTypeCode VARCHAR(20) NOT NULL
-    , relId INT UNSIGNED NOT NULL
+# ARTICLE 테이블 (게시글) - 회원 탈퇴 시 게시글은 남음 (memberId SET NULL)
+CREATE TABLE article(
+    id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    regDate DATETIME NOT NULL,
+    updateDate DATETIME NOT NULL,
+    memberId INT UNSIGNED,
+    title VARCHAR(100) NOT NULL,
+    content TEXT NOT NULL,
+    boardId INT UNSIGNED NOT NULL,
+    views INT UNSIGNED NOT NULL DEFAULT 0,
+    FOREIGN KEY (memberId) REFERENCES MEMBER(id) ON DELETE SET NULL,
+    FOREIGN KEY (boardId) REFERENCES board(id) ON DELETE CASCADE
 );
 
-# REPLY 테이블 (댓글)
+# LIKE_POINT 테이블 (좋아요) - 회원 탈퇴 시 좋아요도 함께 삭제
+CREATE TABLE likePoint(
+    id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    memberId INT UNSIGNED NOT NULL,
+    relTypeCode VARCHAR(20) NOT NULL,
+    relId INT UNSIGNED NOT NULL,
+    UNIQUE KEY (memberId, relTypeCode, relId),
+    FOREIGN KEY (memberId) REFERENCES MEMBER(id) ON DELETE CASCADE
+);
+
+# REPLY 테이블 (댓글) - 회원 탈퇴 시 댓글은 남음 (memberId SET NULL)
 CREATE TABLE reply(
-    id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT
-    , regDate DATETIME NOT NULL
-    , updateDate DATETIME NOT NULL
-    , memberId INT UNSIGNED NOT NULL
-    , relTypeCode VARCHAR(20) NOT NULL
-    , relId INT UNSIGNED NOT NULL
-    , content VARCHAR(500) NOT NULL
+    id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    regDate DATETIME NOT NULL,
+    updateDate DATETIME NOT NULL,
+    memberId INT UNSIGNED,
+    relTypeCode VARCHAR(20) NOT NULL,
+    relId INT UNSIGNED NOT NULL,
+    content VARCHAR(500) NOT NULL,
+    FOREIGN KEY (memberId) REFERENCES MEMBER(id) ON DELETE SET NULL
 );
 
 # FILE 테이블 (파일 업로드)
@@ -159,7 +167,7 @@ INSERT INTO article
         , content = '공지 내용1'
         , boardId = 1;  -- 공지사항
 
-INSERT INTO ar-ticle
+INSERT INTO article
     SET regDate = NOW()
         , updateDate = NOW()
         , memberId = 3

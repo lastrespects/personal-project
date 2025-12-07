@@ -1,8 +1,9 @@
-﻿package com.mmb.service;
+package com.mmb.service;
 
 import com.mmb.dto.ResultData;
 import com.mmb.entity.Member;
 import com.mmb.repository.MemberRepository;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -11,7 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.mail.internet.MimeMessage;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -30,6 +30,8 @@ public class MemberService {
 
     @Value("${spring.mail.username}")
     private String mailFrom;
+    @Value("${spring.mail.password:}")
+    private String mailPassword;
 
     public boolean isUsernameTaken(String username) {
         return memberRepository.existsByUsername(username);
@@ -79,24 +81,24 @@ public class MemberService {
     public ResultData<Map<String, Object>> validateLoginInfo(String username, String rawPassword) {
         Optional<Member> memberOpt = memberRepository.findByUsername(username);
         if (memberOpt.isEmpty()) {
-            return new ResultData<>("F-1", "議댁옱?섏? ?딅뒗 ID?낅땲??");
+            return new ResultData<>("F-1", "해당 아이디를 찾을 수 없습니다.");
         }
 
         Member member = memberOpt.get();
         if (member.isDeleted()) {
             LocalDateTime now = LocalDateTime.now();
             if (member.getRestoreUntil() != null && member.getRestoreUntil().isAfter(now)) {
-                String restoreUntilStr = member.getRestoreUntil().format(DateTimeFormatter.ofPattern("yyyy??MM??dd??HH??mm遺?));
+                String restoreUntilStr = member.getRestoreUntil().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
                 Map<String, Object> data = new HashMap<>();
                 data.put("restoreUntil", restoreUntilStr);
-                return new ResultData<>("D-1", "?덊눜??怨꾩젙?낅땲?? " + restoreUntilStr + "源뚯? 蹂듦뎄?????덉뒿?덈떎.", data);
+                return new ResultData<>("D-1", "계정이 " + restoreUntilStr + " 까지 삭제 예약되었습니다.", data);
             } else {
-                return new ResultData<>("F-1", "怨꾩젙??李얠쓣 ???놁뒿?덈떎.");
+                return new ResultData<>("F-1", "이미 삭제된 계정입니다.");
             }
         }
 
         if (!passwordEncoder.matches(rawPassword, member.getPassword())) {
-            return new ResultData<>("F-2", "鍮꾨?踰덊샇媛 ??몄뒿?덈떎.");
+            return new ResultData<>("F-2", "비밀번호가 올바르지 않습니다.");
         }
 
         Map<String, Object> data = new HashMap<>();
@@ -104,13 +106,13 @@ public class MemberService {
         data.put("authLevel", member.getAuthLevel());
         data.put("username", member.getUsername());
 
-        return new ResultData<>("S-1", "濡쒓렇??媛?ν빀?덈떎.", data);
+        return new ResultData<>("S-1", "로그인에 성공했습니다.", data);
     }
 
     public ResultData<Map<String, Object>> findLoginIdByNameAndEmail(String realName, String email) {
         Optional<Member> memberOpt = memberRepository.findByRealNameAndEmail(realName, email);
         if (memberOpt.isEmpty()) {
-            return new ResultData<>("F-1", "No user matches that name/email.");
+            return new ResultData<>("F-1", "이름과 이메일이 일치하는 사용자를 찾을 수 없습니다.");
         }
         Member member = memberOpt.get();
         boolean sent = sendLoginIdEmail(member.getEmail(), member.getUsername());
@@ -118,15 +120,16 @@ public class MemberService {
         Map<String, Object> data = new HashMap<>();
         data.put("emailSent", sent);
         return new ResultData<>("S-1",
-                sent ? "아이디를 이메일로 보냈습니다."
-                        : "이메일 발송에 실패했습니다.",
+                sent ? "아이디 안내 메일을 발송했습니다."
+                        : "아이디 안내 메일 발송에 실패했습니다.",
                 data);
     }
 
+    @Transactional
     public ResultData<Map<String, Object>> resetPasswordWithEmail(String username, String email) {
         Optional<Member> memberOpt = memberRepository.findByUsernameAndEmail(username, email);
         if (memberOpt.isEmpty()) {
-            return new ResultData<>("F-1", "입력한 정보와 일치하는 사용자가 없습니다.");
+            return new ResultData<>("F-1", "아이디/이메일이 일치하는 사용자를 찾을 수 없습니다.");
         }
 
         String tempPw = createTempPassword(10);
@@ -139,8 +142,8 @@ public class MemberService {
         data.put("emailSent", sent);
 
         return new ResultData<>("S-1",
-                sent ? "임시 비밀번호를 이메일로 보냈습니다."
-                        : "이메일 발송에 실패했습니다.",
+                sent ? "임시 비밀번호 메일을 발송했습니다."
+                        : "임시 비밀번호 메일 발송에 실패했습니다.",
                 data);
     }
 
@@ -148,24 +151,24 @@ public class MemberService {
     public ResultData<Map<String, Object>> updateNickname(String username, String newNickname) {
         Optional<Member> memberOpt = memberRepository.findByUsername(username);
         if (memberOpt.isEmpty()) {
-            return new ResultData<>("F-0", "濡쒓렇?몄씠 ?꾩슂?⑸땲??");
+            return new ResultData<>("F-0", "사용자를 찾을 수 없습니다.");
         }
 
         Member member = memberOpt.get();
 
         if (member.getNickname().equals(newNickname)) {
-            return new ResultData<>("F-1", "湲곗〈 ?됰꽕?꾧낵 ?숈씪?⑸땲??");
+            return new ResultData<>("F-1", "현재 닉네임과 동일합니다.");
         }
 
         if (memberRepository.existsByNickname(newNickname)) {
-            return new ResultData<>("F-2", "以묐났???됰꽕?꾩엯?덈떎.");
+            return new ResultData<>("F-2", "이미 사용 중인 닉네임입니다.");
         }
 
         LocalDateTime lastChanged = member.getNicknameUpdatedAt();
         if (lastChanged != null && lastChanged.plusDays(30).isAfter(LocalDateTime.now())) {
             LocalDateTime nextAvailable = lastChanged.plusDays(30);
             String nextDate = nextAvailable.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            return new ResultData<>("F-3", "?됰꽕?꾩? " + nextDate + " ?댄썑??蹂寃쏀븷 ???덉뒿?덈떎.");
+            return new ResultData<>("F-3", nextDate + " 이후에 닉네임을 변경할 수 있습니다.");
         }
 
         member.setNickname(newNickname);
@@ -175,28 +178,28 @@ public class MemberService {
         Map<String, Object> data = new HashMap<>();
         data.put("nickname", newNickname);
 
-        return new ResultData<>("S-1", "?됰꽕?꾩씠 蹂寃쎈릺?덉뒿?덈떎.", data);
+        return new ResultData<>("S-1", "닉네임을 변경했습니다.", data);
     }
 
     @Transactional
     public ResultData<Map<String, Object>> updatePassword(String username, String newPassword) {
         Optional<Member> memberOpt = memberRepository.findByUsername(username);
         if (memberOpt.isEmpty()) {
-            return new ResultData<>("F-0", "濡쒓렇?몄씠 ?꾩슂?⑸땲??");
+            return new ResultData<>("F-0", "사용자를 찾을 수 없습니다.");
         }
 
         Member member = memberOpt.get();
         member.setPassword(passwordEncoder.encode(newPassword));
         memberRepository.save(member);
 
-        return new ResultData<>("S-1", "鍮꾨?踰덊샇媛 蹂寃쎈릺?덉뒿?덈떎.");
+        return new ResultData<>("S-1", "비밀번호를 변경했습니다.");
     }
 
     @Transactional
     public ResultData<Map<String, Object>> updateProfile(String username, String newNickname, String email, String region, Integer dailyTarget) {
         Optional<Member> memberOpt = memberRepository.findByUsername(username);
         if (memberOpt.isEmpty()) {
-            return new ResultData<>("F-0", "濡쒓렇?몄씠 ?꾩슂?⑸땲??");
+            return new ResultData<>("F-0", "사용자를 찾을 수 없습니다.");
         }
 
         Member member = memberOpt.get();
@@ -204,13 +207,13 @@ public class MemberService {
 
         if (nicknameChanged) {
             if (memberRepository.existsByNickname(newNickname)) {
-                return new ResultData<>("F-2", "以묐났???됰꽕?꾩엯?덈떎.");
+                return new ResultData<>("F-2", "이미 사용 중인 닉네임입니다.");
             }
             LocalDateTime lastChanged = member.getNicknameUpdatedAt();
             if (lastChanged != null && lastChanged.plusDays(30).isAfter(LocalDateTime.now())) {
                 LocalDateTime nextAvailable = lastChanged.plusDays(30);
                 String nextDate = nextAvailable.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                return new ResultData<>("F-3", "?됰꽕?꾩? " + nextDate + " ?댄썑??蹂寃쏀븷 ???덉뒿?덈떎.");
+                return new ResultData<>("F-3", nextDate + " 이후에 닉네임을 변경할 수 있습니다.");
             }
             member.setNickname(newNickname);
             member.setNicknameUpdatedAt(LocalDateTime.now());
@@ -232,14 +235,14 @@ public class MemberService {
         data.put("region", member.getRegion());
         data.put("dailyTarget", member.getDailyTarget());
 
-        return new ResultData<>("S-1", "?뺣낫媛 ??λ릺?덉뒿?덈떎.", data);
+        return new ResultData<>("S-1", "프로필을 변경했습니다.", data);
     }
 
     @Transactional
     public ResultData<Map<String, Object>> withdraw(String username) {
         Optional<Member> memberOpt = memberRepository.findByUsernameAndDeletedAtIsNull(username);
         if (memberOpt.isEmpty()) {
-            return new ResultData<>("F-0", "議댁옱?섏? ?딅뒗 ?뚯썝?낅땲??");
+            return new ResultData<>("F-0", "활성화된 계정을 찾을 수 없습니다.");
         }
         Member member = memberOpt.get();
         LocalDateTime now = LocalDateTime.now();
@@ -248,22 +251,22 @@ public class MemberService {
         memberRepository.save(member);
 
         Map<String, Object> data = new HashMap<>();
-        data.put("restoreUntil", member.getRestoreUntil().format(DateTimeFormatter.ofPattern("yyyy??MM??dd??HH??mm遺?)));
-        return new ResultData<>("S-1", "?덊눜 泥섎━?섏뿀?듬땲?? 7?쇨컙 ?곗씠?곕? 蹂닿??⑸땲??", data);
+        data.put("restoreUntil", member.getRestoreUntil().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+        return new ResultData<>("S-1", "계정이 7일 후 삭제될 예정입니다.", data);
     }
 
     @Transactional
     public ResultData<Map<String, Object>> restore(String username, String rawPassword) {
         Optional<Member> memberOpt = memberRepository.findByUsernameAndDeletedAtIsNotNull(username);
         if (memberOpt.isEmpty()) {
-            return new ResultData<>("F-0", "蹂듦뎄??怨꾩젙??李얠쓣 ???놁뒿?덈떎.");
+            return new ResultData<>("F-0", "삭제된 계정을 찾을 수 없습니다.");
         }
         Member member = memberOpt.get();
         if (member.getRestoreUntil() == null || member.getRestoreUntil().isBefore(LocalDateTime.now())) {
-            return new ResultData<>("F-1", "蹂듦뎄 媛??湲곌컙??吏?ъ뒿?덈떎.");
+            return new ResultData<>("F-1", "복구 가능한 기간이 지났습니다.");
         }
         if (!passwordEncoder.matches(rawPassword, member.getPassword())) {
-            return new ResultData<>("F-2", "鍮꾨?踰덊샇媛 ?쇱튂?섏? ?딆뒿?덈떎.");
+            return new ResultData<>("F-2", "비밀번호가 올바르지 않습니다.");
         }
         member.setDeletedAt(null);
         member.setRestoreUntil(null);
@@ -271,17 +274,17 @@ public class MemberService {
 
         Map<String, Object> data = new HashMap<>();
         data.put("username", member.getUsername());
-        return new ResultData<>("S-1", "怨꾩젙??蹂듦뎄?섏뿀?듬땲??", data);
+        return new ResultData<>("S-1", "계정을 복구했습니다.", data);
     }
 
     private boolean sendLoginIdEmail(String to, String username) {
-        String subject = "[MMB] Account username";
+        String subject = "[MMB] 아이디 안내";
         String body = """
                 <html>
                   <body>
                     <h3>아이디 안내</h3>
-                    <p>가입하신 아이디는 <b>%s</b> 입니다.</p>
-                    <p><a href=\"http://localhost:8081/login\" target=\"_blank\">로그인하러 가기</a></p>
+                    <p>회원님의 아이디는 <b>%s</b> 입니다.</p>
+                    <p><a href="http://localhost:8081/login" target="_blank">로그인 하러가기</a></p>
                   </body>
                 </html>
                 """.formatted(username);
@@ -289,14 +292,14 @@ public class MemberService {
     }
 
     private boolean sendTempPasswordEmail(String to, String tempPassword) {
-        String subject = "[MMB] Temporary password";
+        String subject = "[MMB] 임시 비밀번호 안내";
         String body = """
                 <html>
                   <body>
-                    <h3>임시 비밀번호</h3>
+                    <h3>임시 비밀번호 안내</h3>
                     <p>임시 비밀번호는 <b>%s</b> 입니다.</p>
-                    <p>로그인 후 마이페이지에서 비밀번호를 변경해주세요.</p>
-                    <p><a href=\"http://localhost:8081/login\" target=\"_blank\">로그인하러 가기</a></p>
+                    <p>로그인 후 즉시 새 비밀번호로 변경해주세요.</p>
+                    <p><a href="http://localhost:8081/login" target="_blank">로그인 하러가기</a></p>
                   </body>
                 </html>
                 """.formatted(tempPassword);
@@ -304,6 +307,10 @@ public class MemberService {
     }
 
     private boolean sendEmail(String to, String subject, String htmlBody) {
+        // If mail credentials are not provided, skip sending to avoid blocking calls.
+        if (mailPassword == null || mailPassword.isBlank()) {
+            return false;
+        }
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -329,7 +336,3 @@ public class MemberService {
         return sb.toString();
     }
 }
-
-
-
-

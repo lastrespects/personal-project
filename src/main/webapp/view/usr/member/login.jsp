@@ -32,12 +32,12 @@
             .then(data => {
                 if (data.rsCode) {
                     if (data.rsCode.startsWith('F-')) {
-                        alert(data.rsMsg || '로그인에 실패했습니다.');
+                        alert(data.rsMsg || '로그인 정보가 올바르지 않습니다.');
                         return;
                     }
                     if (data.rsCode === 'D-1') {
                         const restoreUntil = data.data && data.data.restoreUntil ? data.data.restoreUntil : '';
-                        const confirmRestore = confirm(`탈퇴한 계정입니다.\n${restoreUntil ? restoreUntil + '까지 ' : ''}복구하시겠습니까?`);
+                        const confirmRestore = confirm(`탈퇴한 계정입니다.\n${restoreUntil ? restoreUntil + ' 이후 ' : ''}복구하시겠습니까?`);
                         if (!confirmRestore) {
                             return;
                         }
@@ -49,10 +49,10 @@
                         .then(res2 => res2.json())
                         .then(res2 => {
                             if (!res2.rsCode || !res2.rsCode.startsWith('S-')) {
-                                alert(res2.rsMsg || '복구에 실패했습니다.');
+                                alert(res2.rsMsg || '계정 복구에 실패했습니다.');
                                 return;
                             }
-                            alert('계정이 복구되었습니다. 다시 로그인합니다.');
+                            alert('계정을 복구했습니다. 다시 로그인합니다.');
                             form.submit();
                         })
                         .catch(() => alert('복구 요청 중 오류가 발생했습니다.'));
@@ -64,7 +64,7 @@
                 form.submit();
             })
             .catch(() => {
-                alert('로그인 검증 중 오류가 발생했습니다.');
+                alert('로그인 요청 중 오류가 발생했습니다.');
             });
 
         return false;
@@ -79,6 +79,7 @@
             <input type="password" name="password" placeholder="비밀번호" required><br><br>
             <button type="submit">로그인</button>
             <button type="button" onclick="location.href='/usr/member/join'">회원가입</button>
+            <button type="button" onclick="location.href='/usr/home/main'">메인으로 돌아가기</button>
         </form>
         <div style="margin-top:12px;">
             <a href="/usr/member/findLoginId" style="margin-right:10px;">아이디 찾기</a>

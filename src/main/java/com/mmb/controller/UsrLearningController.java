@@ -21,15 +21,31 @@ public class UsrLearningController {
     private final LearningService learningService;
     private final MemberService memberService;
 
-    @GetMapping("/today")
-    public String showTodayLearning(Model model, Principal principal) {
+    @GetMapping("/wordbook")
+    public String showWordbook(Model model, Principal principal) {
         if (principal == null) {
             return "redirect:/login?msg=PleaseLogin";
         }
 
         String username = principal.getName();
         Member member = memberService.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+
+        List<TodayWordDto> todayWords = learningService.prepareTodayWords(member.getId());
+        model.addAttribute("todayWords", todayWords);
+
+        return "usr/learning/wordbook";
+    }
+
+    @GetMapping({"/quiz", "/today"})
+    public String showQuiz(Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/login?msg=PleaseLogin";
+        }
+
+        String username = principal.getName();
+        Member member = memberService.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
 
         List<TodayWordDto> todayWords = learningService.prepareTodayWords(member.getId());
         model.addAttribute("todayWords", todayWords);

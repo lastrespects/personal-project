@@ -1,13 +1,16 @@
 // src/main/java/com/mmb/api/DeepLTranslationClient.java
 package com.mmb.api;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -23,27 +26,35 @@ public class DeepLTranslationClient implements TranslationClient {
 
     @Override
     public String translateToKorean(String englishText) {
-        // 실제 DeepL 호출 로직은 프로젝트에 맞게 구현하고,
-        // 일단은 컴파일을 위해 간단하게 형태만 맞춰둘 수도 있음.
-
         try {
-            Map<String, Object> body = new HashMap<>();
-            body.put("text", new String[]{englishText});
-            body.put("target_lang", "KO");
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-            // TODO: DeepL API 스펙에 맞게 request/response 구현
-            // Map response = restTemplate.postForObject(apiUrl + "?auth_key=" + apiKey, body, Map.class);
-            // 실제 번역 텍스트 꺼내기...
+            MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+            body.add("auth_key", apiKey);
+            body.add("text", englishText);
+            body.add("target_lang", "KO");
+            body.add("source_lang", "EN");
 
-            return englishText; // 임시: 실패 시 원문 반환
-        } catch (Exception e) {
-            // 에러 시에도 일단 원문 반환
-            return englishText;
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+            String response = restTemplate.postForObject(apiUrl, request, String.class);
+            if (response == null || response.isBlank()) {
+                return englishText;
+            }
+            JsonNode root = new com.fasterxml.jackson.databind.ObjectMapper().readTree(response);
+            JsonNode translations = root.path("translations");
+            if (translations.isArray() && translations.size() > 0) {
+                String text = translations.get(0).path("text").asText();
+                if (text != null && !text.isBlank()) {
+                    return text;
+                }
+            }
+        } catch (Exception ignored) {
         }
+        return englishText;
     }
 
-    // 기존 코드에서 translateEnToKo(...)를 직접 호출하고 있다면,
-    // 이렇게 래핑 메서드를 하나 만들어주면 됨 (Override X)
+    // 기존 헬퍼
     public String translateEnToKo(String englishText) {
         return translateToKorean(englishText);
     }

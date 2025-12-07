@@ -1,0 +1,5513 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.8)
+
+2025-12-06T17:28:04.057+09:00  INFO 7804 --- [mmb] [           main] com.mmb.MmbApplication                   : Starting MmbApplication v0.0.1-SNAPSHOT using Java 21.0.9 with PID 7804 (D:\mwg\mmb\target\mmb-0.0.1-SNAPSHOT.jar started by admin in D:\mwg\mmb)
+2025-12-06T17:28:04.058+09:00  INFO 7804 --- [mmb] [           main] com.mmb.MmbApplication                   : No active profile set, falling back to 1 default profile: "default"
+2025-12-06T17:28:04.732+09:00  INFO 7804 --- [mmb] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-12-06T17:28:04.831+09:00  INFO 7804 --- [mmb] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 85 ms. Found 3 JPA repository interfaces.
+2025-12-06T17:28:05.388+09:00  INFO 7804 --- [mmb] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8081 (http)
+2025-12-06T17:28:05.403+09:00  INFO 7804 --- [mmb] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-12-06T17:28:05.403+09:00  INFO 7804 --- [mmb] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.49]
+2025-12-06T17:28:06.213+09:00  INFO 7804 --- [mmb] [           main] org.apache.jasper.servlet.TldScanner     : At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+2025-12-06T17:28:06.339+09:00  INFO 7804 --- [mmb] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-12-06T17:28:06.340+09:00  INFO 7804 --- [mmb] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2249 ms
+2025-12-06T17:28:06.423+09:00  INFO 7804 --- [mmb] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-12-06T17:28:06.710+09:00  INFO 7804 --- [mmb] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@6cceb281
+2025-12-06T17:28:06.715+09:00  INFO 7804 --- [mmb] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-12-06T17:28:06.792+09:00  INFO 7804 --- [mmb] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-12-06T17:28:06.849+09:00  INFO 7804 --- [mmb] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.36.Final
+2025-12-06T17:28:06.882+09:00  INFO 7804 --- [mmb] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-12-06T17:28:07.210+09:00  INFO 7804 --- [mmb] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-12-06T17:28:07.277+09:00  WARN 7804 --- [mmb] [           main] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-12-06T17:28:07.279+09:00  WARN 7804 --- [mmb] [           main] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-12-06T17:28:07.290+09:00  INFO 7804 --- [mmb] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-12-06T17:28:07.908+09:00  INFO 7804 --- [mmb] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-12-06T17:28:07.908+09:00  INFO 7804 --- [mmb] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-12-06T17:28:08.340+09:00  INFO 7804 --- [mmb] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+Hibernate: 
+    select
+        count(*) 
+    from
+        word w1_0
+2025-12-06T17:28:09.265+09:00  WARN 7804 --- [mmb] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-12-06T17:28:09.284+09:00  INFO 7804 --- [mmb] [           main] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2025-12-06T17:28:09.284+09:00  WARN 7804 --- [mmb] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-12-06T17:28:09.391+09:00  INFO 7804 --- [mmb] [           main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+2025-12-06T17:28:09.529+09:00 DEBUG 7804 --- [mmb] [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, LogoutFilter, UsernamePasswordAuthenticationFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, ExceptionTranslationFilter, AuthorizationFilter
+2025-12-06T17:28:09.856+09:00  INFO 7804 --- [mmb] [           main] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2025-12-06T17:28:09.859+09:00  INFO 7804 --- [mmb] [           main] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@414c2c8c]]
+2025-12-06T17:28:09.860+09:00  INFO 7804 --- [mmb] [           main] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2025-12-06T17:28:09.884+09:00  INFO 7804 --- [mmb] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8081 (http) with context path '/'
+2025-12-06T17:28:09.897+09:00  INFO 7804 --- [mmb] [           main] com.mmb.MmbApplication                   : Started MmbApplication in 6.215 seconds (process running for 6.622)
+2025-12-06T17:29:09.870+09:00  INFO 7804 --- [mmb] [MessageBroker-1] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 1, active threads = 1, queued tasks = 0, completed tasks = 0]
+2025-12-06T17:29:11.696+09:00  INFO 7804 --- [mmb] [nio-8081-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-12-06T17:29:11.699+09:00  INFO 7804 --- [mmb] [nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-12-06T17:29:11.700+09:00  INFO 7804 --- [mmb] [nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2025-12-06T17:29:11.711+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-1] o.s.security.web.FilterChainProxy        : Securing GET /learning/quiz
+2025-12-06T17:29:11.718+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-1] o.s.security.web.FilterChainProxy        : Secured GET /learning/quiz
+2025-12-06T17:29:11.743+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-1] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-12-06T17:29:11.756+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-3] o.s.security.web.FilterChainProxy        : Securing GET /login?msg=PleaseLogin
+2025-12-06T17:29:11.762+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-3] o.s.security.web.FilterChainProxy        : Secured GET /login?msg=PleaseLogin
+2025-12-06T17:29:11.770+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-3] o.s.security.web.FilterChainProxy        : Securing GET /view/usr/member/login.jsp?msg=PleaseLogin
+2025-12-06T17:29:11.771+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-3] o.s.security.web.FilterChainProxy        : Secured GET /view/usr/member/login.jsp?msg=PleaseLogin
+2025-12-06T17:29:12.182+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-3] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-12-06T17:29:16.101+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-6] o.s.security.web.FilterChainProxy        : Securing POST /usr/member/validLoginInfo
+2025-12-06T17:29:16.104+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-6] o.s.security.web.FilterChainProxy        : Secured POST /usr/member/validLoginInfo
+Hibernate: 
+    select
+        m1_0.id,
+        m1_0.age,
+        m1_0.authLevel,
+        m1_0.dailyTarget,
+        m1_0.deletedAt,
+        m1_0.email,
+        m1_0.nickname,
+        m1_0.nicknameUpdatedAt,
+        m1_0.PASSWORD,
+        m1_0.realName,
+        m1_0.regDate,
+        m1_0.region,
+        m1_0.restoreUntil,
+        m1_0.updateDate,
+        m1_0.username 
+    from
+        member m1_0 
+    where
+        m1_0.username=?
+2025-12-06T17:29:16.251+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-6] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-12-06T17:29:16.257+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-4] o.s.security.web.FilterChainProxy        : Securing POST /doLogin
+Hibernate: 
+    select
+        m1_0.id,
+        m1_0.age,
+        m1_0.authLevel,
+        m1_0.dailyTarget,
+        m1_0.deletedAt,
+        m1_0.email,
+        m1_0.nickname,
+        m1_0.nicknameUpdatedAt,
+        m1_0.PASSWORD,
+        m1_0.realName,
+        m1_0.regDate,
+        m1_0.region,
+        m1_0.restoreUntil,
+        m1_0.updateDate,
+        m1_0.username 
+    from
+        member m1_0 
+    where
+        m1_0.username=?
+[UserDetailsService] username=����¯1234, password=$2a$10$sPWP5NsNThY2xHoBa7CmAu8ZudYZ40aNpAzSLnRIGaD/fltfSV5Qi
+2025-12-06T17:29:16.384+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-4] o.s.s.a.dao.DaoAuthenticationProvider    : Authenticated user
+2025-12-06T17:29:16.385+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-4] .s.ChangeSessionIdAuthenticationStrategy : Changed session id from FED5F48E98D44A6F6DA8B183900B09A0
+2025-12-06T17:29:16.387+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-4] w.c.HttpSessionSecurityContextRepository : Stored SecurityContextImpl [Authentication=UsernamePasswordAuthenticationToken [Principal=org.springframework.security.core.userdetails.User [Username=영민짱1234, Password=[PROTECTED], Enabled=true, AccountNonExpired=true, CredentialsNonExpired=true, AccountNonLocked=true, Granted Authorities=[ROLE_USER]], Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=0:0:0:0:0:0:0:1, SessionId=FED5F48E98D44A6F6DA8B183900B09A0], Granted Authorities=[ROLE_USER]]] to HttpSession [org.apache.catalina.session.StandardSessionFacade@630e51c2]
+2025-12-06T17:29:16.387+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-4] w.a.UsernamePasswordAuthenticationFilter : Set SecurityContextHolder to UsernamePasswordAuthenticationToken [Principal=org.springframework.security.core.userdetails.User [Username=영민짱1234, Password=[PROTECTED], Enabled=true, AccountNonExpired=true, CredentialsNonExpired=true, AccountNonLocked=true, Granted Authorities=[ROLE_USER]], Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=0:0:0:0:0:0:0:1, SessionId=FED5F48E98D44A6F6DA8B183900B09A0], Granted Authorities=[ROLE_USER]]
+2025-12-06T17:29:16.388+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-4] o.s.s.web.DefaultRedirectStrategy        : Redirecting to /usr/home/main
+2025-12-06T17:29:16.390+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-5] o.s.security.web.FilterChainProxy        : Securing GET /usr/home/main
+2025-12-06T17:29:16.391+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-5] o.s.security.web.FilterChainProxy        : Secured GET /usr/home/main
+2025-12-06T17:29:16.392+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-5] w.c.HttpSessionSecurityContextRepository : Retrieved SecurityContextImpl [Authentication=UsernamePasswordAuthenticationToken [Principal=org.springframework.security.core.userdetails.User [Username=영민짱1234, Password=[PROTECTED], Enabled=true, AccountNonExpired=true, CredentialsNonExpired=true, AccountNonLocked=true, Granted Authorities=[ROLE_USER]], Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=0:0:0:0:0:0:0:1, SessionId=FED5F48E98D44A6F6DA8B183900B09A0], Granted Authorities=[ROLE_USER]]]
+Hibernate: 
+    select
+        m1_0.id,
+        m1_0.age,
+        m1_0.authLevel,
+        m1_0.dailyTarget,
+        m1_0.deletedAt,
+        m1_0.email,
+        m1_0.nickname,
+        m1_0.nicknameUpdatedAt,
+        m1_0.PASSWORD,
+        m1_0.realName,
+        m1_0.regDate,
+        m1_0.region,
+        m1_0.restoreUntil,
+        m1_0.updateDate,
+        m1_0.username 
+    from
+        member m1_0 
+    where
+        m1_0.username=?
+2025-12-06T17:29:16.437+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-5] o.s.security.web.FilterChainProxy        : Securing GET /view/usr/home/main.jsp
+2025-12-06T17:29:16.438+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-5] o.s.security.web.FilterChainProxy        : Secured GET /view/usr/home/main.jsp
+2025-12-06T17:29:18.180+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-2] o.s.security.web.FilterChainProxy        : Securing GET /learning/wordbook
+2025-12-06T17:29:18.183+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-2] o.s.security.web.FilterChainProxy        : Secured GET /learning/wordbook
+2025-12-06T17:29:18.184+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-2] w.c.HttpSessionSecurityContextRepository : Retrieved SecurityContextImpl [Authentication=UsernamePasswordAuthenticationToken [Principal=org.springframework.security.core.userdetails.User [Username=영민짱1234, Password=[PROTECTED], Enabled=true, AccountNonExpired=true, CredentialsNonExpired=true, AccountNonLocked=true, Granted Authorities=[ROLE_USER]], Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=0:0:0:0:0:0:0:1, SessionId=FED5F48E98D44A6F6DA8B183900B09A0], Granted Authorities=[ROLE_USER]]]
+Hibernate: 
+    select
+        m1_0.id,
+        m1_0.age,
+        m1_0.authLevel,
+        m1_0.dailyTarget,
+        m1_0.deletedAt,
+        m1_0.email,
+        m1_0.nickname,
+        m1_0.nicknameUpdatedAt,
+        m1_0.PASSWORD,
+        m1_0.realName,
+        m1_0.regDate,
+        m1_0.region,
+        m1_0.restoreUntil,
+        m1_0.updateDate,
+        m1_0.username 
+    from
+        member m1_0 
+    where
+        m1_0.username=?
+Hibernate: 
+    select
+        sr1_0.id,
+        sr1_0.correctCount,
+        sr1_0.incorrectCount,
+        sr1_0.lastReviewDate,
+        sr1_0.memberId,
+        sr1_0.regDate,
+        sr1_0.totalAttempts,
+        sr1_0.wordId 
+    from
+        study_record sr1_0 
+    where
+        sr1_0.memberId=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    insert 
+    into
+        study_record
+        (correctCount, incorrectCount, lastReviewDate, memberId, regDate, totalAttempts, wordId) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        study_record
+        (correctCount, incorrectCount, lastReviewDate, memberId, regDate, totalAttempts, wordId) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        study_record
+        (correctCount, incorrectCount, lastReviewDate, memberId, regDate, totalAttempts, wordId) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        study_record
+        (correctCount, incorrectCount, lastReviewDate, memberId, regDate, totalAttempts, wordId) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        study_record
+        (correctCount, incorrectCount, lastReviewDate, memberId, regDate, totalAttempts, wordId) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        study_record
+        (correctCount, incorrectCount, lastReviewDate, memberId, regDate, totalAttempts, wordId) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        study_record
+        (correctCount, incorrectCount, lastReviewDate, memberId, regDate, totalAttempts, wordId) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        study_record
+        (correctCount, incorrectCount, lastReviewDate, memberId, regDate, totalAttempts, wordId) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        study_record
+        (correctCount, incorrectCount, lastReviewDate, memberId, regDate, totalAttempts, wordId) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        study_record
+        (correctCount, incorrectCount, lastReviewDate, memberId, regDate, totalAttempts, wordId) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+2025-12-06T17:29:20.624+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-2] o.s.security.web.FilterChainProxy        : Securing GET /view/usr/learning/wordbook.jsp
+2025-12-06T17:29:20.625+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-2] o.s.security.web.FilterChainProxy        : Secured GET /view/usr/learning/wordbook.jsp
+2025-12-06T17:29:23.066+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-7] o.s.security.web.FilterChainProxy        : Securing GET /usr/home/main
+2025-12-06T17:29:23.068+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-7] o.s.security.web.FilterChainProxy        : Secured GET /usr/home/main
+2025-12-06T17:29:23.070+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-7] w.c.HttpSessionSecurityContextRepository : Retrieved SecurityContextImpl [Authentication=UsernamePasswordAuthenticationToken [Principal=org.springframework.security.core.userdetails.User [Username=영민짱1234, Password=[PROTECTED], Enabled=true, AccountNonExpired=true, CredentialsNonExpired=true, AccountNonLocked=true, Granted Authorities=[ROLE_USER]], Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=0:0:0:0:0:0:0:1, SessionId=FED5F48E98D44A6F6DA8B183900B09A0], Granted Authorities=[ROLE_USER]]]
+Hibernate: 
+    select
+        m1_0.id,
+        m1_0.age,
+        m1_0.authLevel,
+        m1_0.dailyTarget,
+        m1_0.deletedAt,
+        m1_0.email,
+        m1_0.nickname,
+        m1_0.nicknameUpdatedAt,
+        m1_0.PASSWORD,
+        m1_0.realName,
+        m1_0.regDate,
+        m1_0.region,
+        m1_0.restoreUntil,
+        m1_0.updateDate,
+        m1_0.username 
+    from
+        member m1_0 
+    where
+        m1_0.id=?
+2025-12-06T17:29:23.077+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-7] o.s.security.web.FilterChainProxy        : Securing GET /view/usr/home/main.jsp
+2025-12-06T17:29:23.077+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-7] o.s.security.web.FilterChainProxy        : Secured GET /view/usr/home/main.jsp
+2025-12-06T17:29:24.057+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-8] o.s.security.web.FilterChainProxy        : Securing GET /learning/quiz
+2025-12-06T17:29:24.060+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-8] o.s.security.web.FilterChainProxy        : Secured GET /learning/quiz
+2025-12-06T17:29:24.061+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-8] w.c.HttpSessionSecurityContextRepository : Retrieved SecurityContextImpl [Authentication=UsernamePasswordAuthenticationToken [Principal=org.springframework.security.core.userdetails.User [Username=영민짱1234, Password=[PROTECTED], Enabled=true, AccountNonExpired=true, CredentialsNonExpired=true, AccountNonLocked=true, Granted Authorities=[ROLE_USER]], Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=0:0:0:0:0:0:0:1, SessionId=FED5F48E98D44A6F6DA8B183900B09A0], Granted Authorities=[ROLE_USER]]]
+Hibernate: 
+    select
+        m1_0.id,
+        m1_0.age,
+        m1_0.authLevel,
+        m1_0.dailyTarget,
+        m1_0.deletedAt,
+        m1_0.email,
+        m1_0.nickname,
+        m1_0.nicknameUpdatedAt,
+        m1_0.PASSWORD,
+        m1_0.realName,
+        m1_0.regDate,
+        m1_0.region,
+        m1_0.restoreUntil,
+        m1_0.updateDate,
+        m1_0.username 
+    from
+        member m1_0 
+    where
+        m1_0.username=?
+Hibernate: 
+    select
+        sr1_0.id,
+        sr1_0.correctCount,
+        sr1_0.incorrectCount,
+        sr1_0.lastReviewDate,
+        sr1_0.memberId,
+        sr1_0.regDate,
+        sr1_0.totalAttempts,
+        sr1_0.wordId 
+    from
+        study_record sr1_0 
+    where
+        sr1_0.memberId=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    select
+        w1_0.id,
+        w1_0.audioPath,
+        w1_0.exampleSentence,
+        w1_0.meaning,
+        w1_0.regDate,
+        w1_0.spelling,
+        w1_0.updateDate 
+    from
+        word w1_0 
+    where
+        w1_0.spelling=?
+Hibernate: 
+    insert 
+    into
+        study_record
+        (correctCount, incorrectCount, lastReviewDate, memberId, regDate, totalAttempts, wordId) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        study_record
+        (correctCount, incorrectCount, lastReviewDate, memberId, regDate, totalAttempts, wordId) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        study_record
+        (correctCount, incorrectCount, lastReviewDate, memberId, regDate, totalAttempts, wordId) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        study_record
+        (correctCount, incorrectCount, lastReviewDate, memberId, regDate, totalAttempts, wordId) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        study_record
+        (correctCount, incorrectCount, lastReviewDate, memberId, regDate, totalAttempts, wordId) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        study_record
+        (correctCount, incorrectCount, lastReviewDate, memberId, regDate, totalAttempts, wordId) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        study_record
+        (correctCount, incorrectCount, lastReviewDate, memberId, regDate, totalAttempts, wordId) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        study_record
+        (correctCount, incorrectCount, lastReviewDate, memberId, regDate, totalAttempts, wordId) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        study_record
+        (correctCount, incorrectCount, lastReviewDate, memberId, regDate, totalAttempts, wordId) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        study_record
+        (correctCount, incorrectCount, lastReviewDate, memberId, regDate, totalAttempts, wordId) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+2025-12-06T17:29:25.560+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-8] o.s.security.web.FilterChainProxy        : Securing GET /view/usr/learning/today.jsp
+2025-12-06T17:29:25.561+09:00 DEBUG 7804 --- [mmb] [nio-8081-exec-8] o.s.security.web.FilterChainProxy        : Secured GET /view/usr/learning/today.jsp

@@ -13,7 +13,7 @@
     <div style="text-align:right; margin:10px 0;">
         <c:choose>
             <c:when test="${pageContext.request.userPrincipal == null}">
-                <button onclick="location.href='/login'">로그인하기</button>
+                <button onclick="location.href='/login'">로그인</button>
             </c:when>
             <c:otherwise>
                 <c:set var="displayNickname" value="${not empty member ? member.nickname : pageContext.request.userPrincipal.name}" />
@@ -35,7 +35,8 @@
             <c:if test="${not empty member}">
                 닉네임: ${member.nickname}<br>
                 레벨: ${member.characterLevel}<br>
-                경험치: ${member.currentExp} / 100
+                경험치: ${member.currentExp} / 100<br>
+                일일 학습량: ${member.dailyTarget}
             </c:if>
         </p>
     </div>
@@ -44,11 +45,11 @@
     <div style="display:inline-block; margin-left:20px; vertical-align:top; width:500px;">
         <!-- 학습 -->
         <div style="border:1px solid blue; padding:10px; margin-bottom:10px;">
-            <h3>오늘 사용할 학습</h3>
-            <p>(학습 데이터는 추후 study_record 기반으로 채워 예정)</p>
+            <h3>오늘 학습 메뉴</h3>
+            <p>(학습 데이터는 추후 study_record 기반으로 채울 예정)</p>
         </div>
 
-        <!-- 공지 보여주기 (Q&A는 메인공지 분리) -->
+        <!-- 공지 -->
         <div style="border:1px solid #aaa; padding:10px;">
             <h3>최근 공지사항</h3>
             <c:if test="${empty notices}">
@@ -76,17 +77,20 @@
     <!-- 학습 메뉴 영역 -->
     <h2>오늘 학습 메뉴</h2>
     <div style="margin-top:10px;">
-        <button style="width:200px; height:50px; font-size:18px;" onclick="location.href='/learning/today'">
-            오늘의 단어 공부
+        <button style="width:200px; height:50px; font-size:18px;" onclick="location.href='/learning/wordbook'">
+            오늘의 단어장
+        </button>
+        <button style="width:200px; height:50px; font-size:18px; margin-left:10px;"
+            onclick="location.href='/learning/quiz'">
+            오늘의 퀴즈
         </button>
         <button style="width:200px; height:50px; font-size:18px; margin-left:10px;"
             onclick="location.href='/usr/study/log'">
-            누적 학습 로그
+            학습 로그
         </button>
-        <!-- 로그인 없이도 Q&A로 이동 -->
         <button style="width:200px; height:50px; font-size:18px; margin-left:10px;"
             onclick="location.href='/usr/article/list?boardId=2'">
-            질문하기(Q&A 게시판)
+            질문하기(Q&A)
         </button>
     </div>
 

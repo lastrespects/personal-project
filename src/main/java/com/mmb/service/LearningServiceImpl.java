@@ -1,6 +1,7 @@
 package com.mmb.service;
 
 import com.mmb.api.TranslationClient;
+import com.mmb.api.ExampleClient;
 import com.mmb.service.LocalMeaningDictionary;
 import com.mmb.dto.TodayWordDto;
 import com.mmb.entity.Member;
@@ -29,6 +30,7 @@ public class LearningServiceImpl implements LearningService {
     private final StudyRecordRepository studyRecordRepository;
     private final WordGenerationService wordGenerationService;
     private final TranslationClient translationClient;
+    private final ExampleClient exampleClient;
     private final WordRepository wordRepository;
 
     @Override
@@ -58,11 +60,12 @@ public class LearningServiceImpl implements LearningService {
         for (StudyRecord record : dueRecords) {
             Word w = record.getWord();
             String meaning = resolveMeaning(w);
+            String example = resolveExample(w);
             uniqMap.put(w.getId(), TodayWordDto.builder()
                     .wordId(w.getId())
                     .spelling(w.getSpelling())
                     .meaning(meaning)
-                    .exampleSentence(w.getExampleSentence())
+                    .exampleSentence(example)
                     .audioPath(w.getAudioPath())
                     .review(true)
                     .build());
@@ -86,11 +89,12 @@ public class LearningServiceImpl implements LearningService {
                 studyRecordRepository.save(record);
 
                 String meaning = resolveMeaning(w);
+                String example = resolveExample(w);
                 uniqMap.put(w.getId(), TodayWordDto.builder()
                         .wordId(w.getId())
                         .spelling(w.getSpelling())
                         .meaning(meaning)
-                        .exampleSentence(w.getExampleSentence())
+                        .exampleSentence(example)
                         .audioPath(w.getAudioPath())
                         .review(false)
                         .build());
@@ -113,11 +117,13 @@ public class LearningServiceImpl implements LearningService {
                         .lastReviewDate(null)
                         .build();
                 studyRecordRepository.save(record);
+                String meaning = resolveMeaning(w);
+                String example = resolveExample(w);
                 uniqMap.put(w.getId(), TodayWordDto.builder()
                         .wordId(w.getId())
                         .spelling(w.getSpelling())
-                        .meaning(resolveMeaning(w))
-                        .exampleSentence(w.getExampleSentence())
+                        .meaning(meaning)
+                        .exampleSentence(example)
                         .audioPath(w.getAudioPath())
                         .review(false)
                         .build());
@@ -200,35 +206,73 @@ public class LearningServiceImpl implements LearningService {
         return dateA.compareTo(dateB);
     }
 
-    private String resolveMeaning(Word w) {
-        String meaning = (w.getMeaning() != null && !w.getMeaning().isBlank()) ? w.getMeaning() : null;
-        String spellingLower = w.getSpelling() != null ? w.getSpelling().toLowerCase() : "";
+        private String resolveMeaning(Word w) {
+        String spelling = w.getSpelling() != null ? w.getSpelling() : "";
+        String meaning = w.getMeaning();
 
-        // 이미 값이 있지만 스펠링과 같거나 영문만 있으면 한글로 교체 시도
-        if (meaning != null) {
+        boolean hasMeaning = meaning != null && !meaning.isBlank() && !"null".equalsIgnoreCase(meaning);
+        if (hasMeaning) {
             String meaningLower = meaning.toLowerCase();
-            boolean looksEnglishOnly = meaning.matches("(?i)[a-z\\s]+");
-            if (!meaningLower.equals(spellingLower) && !looksEnglishOnly) {
-                return meaning; // 이미 한글처럼 보이면 그대로 사용
+            boolean looksEnglishOnly = meaning.matches("(?i)[a-z\s]+");
+            if (!meaningLower.equals(spelling.toLowerCase()) && !looksEnglishOnly) {
+                return meaning;
             }
         }
 
-        String local = LOCAL_MEANINGS.get(spellingLower);
+        String local = LOCAL_MEANINGS.get(spelling.toLowerCase());
         if (local != null && !local.isBlank()) {
             w.setMeaning(local);
             wordRepository.save(w);
             return local;
         }
         try {
-            String translated = translationClient.translateToKorean(w.getSpelling());
-            if (translated != null && !translated.isBlank()) {
+            String translated = translationClient.translateToKorean(spelling);
+            if (translated != null && !translated.isBlank() && !translated.equalsIgnoreCase(spelling)) {
                 w.setMeaning(translated);
                 wordRepository.save(w);
                 return translated;
             }
         } catch (Exception ignored) {
         }
-        return w.getSpelling();
+        String fallback = hasMeaning ? meaning : spelling;
+        w.setMeaning(fallback);
+        wordRepository.save(w);
+        return fallback;
+    }
+
+private String resolveExample(Word w) {
+        String current = w.getExampleSentence();
+        if (current != null && !current.isBlank() && !"null".equalsIgnoreCase(current)) {
+            // 이미 해석이 붙어 있다면 그대로 반환
+            if (current.contains("해석:")) {
+                return current;
+            }
+            return appendKoTranslation(current);
+        }
+        try {
+            return exampleClient.fetchExample(w.getSpelling())
+                    .map(ex -> {
+                        String withKo = appendKoTranslation(ex);
+                        w.setExampleSentence(withKo);
+                        wordRepository.save(w);
+                        return withKo;
+                    })
+                    .orElse("");
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private String appendKoTranslation(String exampleEn) {
+        try {
+            String ko = translationClient.translateToKorean(exampleEn);
+            // DeepL이 실패하면 동일한 영문을 반환할 수 있으므로 중복 방지
+            if (ko != null && !ko.isBlank() && !exampleEn.equals(ko)) {
+                return exampleEn + " / 해석: " + ko;
+            }
+        } catch (Exception ignored) {
+        }
+        return exampleEn;
     }
 }
 

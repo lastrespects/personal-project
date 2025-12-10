@@ -25,7 +25,10 @@
 .DS_Store
 Thumbs.db
 
-# ===== Temp / dump / backup =====
+# ===== Temp / backup / dump =====
 *.bak
 *_dump*.txt
-temp_*.py
+build.log
+server-run.log
+temp_patch.py
+rewrite_script.py

@@ -1,0 +1,31 @@
+# ===== Build output =====
+/target/
+/build/
+*.class
+
+# ===== Logs =====
+/logs/
+*.log
+*.gz
+*.out
+*.err
+
+# ===== Local DB / data =====
+/mysql-data/
+
+# ===== IDE =====
+.vscode/
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+
+# ===== Temp / dump / backup =====
+*.bak
+*_dump*.txt
+temp_*.py

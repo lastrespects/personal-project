@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>MMB (Memory Mastery Booster)</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        h1 { color: #333; }
+        .container { max-width: 800px; margin: auto; }
+        #quiz-list { list-style: none; padding: 0; }
+        #quiz-list li { 
+            background: #f9f9f9; 
+            margin-bottom: 10px; 
+            padding: 15px; 
+            border-radius: 5px; 
+            border-left: 5px solid #007bff; 
+        }
+        #quiz-list button { 
+            margin-left: 10px; 
+            padding: 5px 10px; 
+            cursor: pointer; 
+            background-color: #28a745; 
+            color: white; 
+            border: none; 
+            border-radius: 3px;
+        }
+        .error { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>오늘의 단어 학습 퀴즈 (30개)</h1>
+    <p id="member-info">사용자ID: 1 (예시)</p>
+    
+    <div class="error" id="error-message"></div>
+
+    <h2>단어 목록</h2>
+    <ul id="quiz-list">
+        <li>로드 중...</li>
+    </ul>
+
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const memberId = 1; 
+        const quizStartUrl = `http://localhost:8081/api/start/${memberId}`;
+        
+        const quizListElement = document.getElementById('quiz-list');
+        const errorElement = document.getElementById('error-message');
+        const memberInfoElement = document.getElementById('member-info');
+
+        memberInfoElement.textContent = `사용자ID: ${memberId}`;
+
+        fetch(quizStartUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('퀴즈 로드 실패 (HTTP Error): ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(quizData => {
+                quizListElement.innerHTML = ''; 
+                errorElement.textContent = '';
+                
+                quizData.forEach(item => { 
+                    const listItem = document.createElement('li');
+                    
+                    if (item.word) {
+                        const spelling = item.word.spelling;
+                        const meaning = item.word.meaning;
+                        const example = item.word.exampleSentence;
+                        const audio = item.word.audioPath;
+
+                        const textContent = `${spelling}: ${meaning} (예문: ${example || '예문 준비중'})`;
+                        const textSpan = document.createElement('span');
+                        textSpan.textContent = textContent;
+                        listItem.appendChild(textSpan);
+
+                        const audioBtn = document.createElement('button');
+                        audioBtn.textContent = '발음 듣기';
+                        audioBtn.onclick = () => {
+                            if (audio && audio.startsWith('http')) {
+                                new Audio(audio).play().catch(e => console.error("Audio playback failed:", e));
+                            } else if ('speechSynthesis' in window) {
+                                const utter = new SpeechSynthesisUtterance(spelling);
+                                utter.lang = 'en-US';
+                                window.speechSynthesis.speak(utter);
+                            } else {
+                                alert('브라우저에서 음성 합성이 지원되지 않습니다.');
+                            }
+                        };
+                        listItem.appendChild(audioBtn);
+                    } else {
+                        listItem.textContent = '단어 데이터 로드 실패';
+                    }
+
+                    quizListElement.appendChild(listItem);
+                });
+            })
+            .catch(error => {
+                errorElement.textContent = '서버 통신 또는 데이터 로드 오류 발생: ' + error.message;
+                console.error('Fetch Error:', error);
+            });
+    });
+</script>
+
+</body>
+</html>

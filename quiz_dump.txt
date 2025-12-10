@@ -1,0 +1,724 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>오늘의 퀴즈 - My Memory Book</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 24px; }
+        .page-title { margin-bottom: 8px; }
+        .sub-info { color: #555; margin-bottom: 16px; }
+
+        .quiz-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 18px;
+            max-width: 760px;
+            background: #fafafa;
+        }
+
+        .progress { font-size: 14px; color: #666; margin-bottom: 8px; }
+        .question { font-size: 20px; font-weight: bold; margin-bottom: 12px; }
+
+        .option-list { display: grid; gap: 10px; margin-bottom: 10px; }
+        .option-btn {
+            padding: 12px 14px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: #fff;
+            cursor: pointer;
+            text-align: left;
+            font-size: 15px;
+            transition: all 0.15s ease;
+        }
+        .option-btn:hover {
+            border-color: #7aa3ff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+        }
+        .option-btn.correct { background: #e8f6ec; border-color: #4caf50; color: #256029; }
+        .option-btn.wrong { background: #ffecec; border-color: #f44336; color: #b71c1c; }
+
+        .feedback { min-height: 22px; margin-top: 6px; font-weight: bold; }
+        .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 6px; }
+        .match-col { display: flex; flex-direction: column; gap: 8px; }
+        .match-item {
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: #fff;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.15s ease;
+        }
+        .match-item.selected { border-color: #7aa3ff; background: #eef2ff; }
+        .match-item.matched { background: #e8f6ec; border-color: #4caf50; color: #256029; cursor: default; }
+        .match-item.wrong { background: #ffecec; border-color: #f44336; color: #b71c1c; }
+        .input-wrap { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+        .text-input { flex: 1; min-width: 180px; padding: 10px 12px; border: 1px solid #ccc; border-radius: 8px; }
+        .cloze-line { margin-top: 6px; font-size: 16px; font-weight: normal; color: #333; }
+        .audio-wrap { margin-bottom: 8px; }
+
+        .controls { margin-top: 12px; display: flex; gap: 10px; }
+        .primary {
+            background: #2c6bed; color: #fff; border: none;
+            padding: 10px 16px; border-radius: 8px; cursor: pointer;
+        }
+        .secondary {
+            background: #f1f1f1; color: #333; border: 1px solid #ccc;
+            padding: 10px 16px; border-radius: 8px; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1 class="page-title">오늘의 퀴즈</h1>
+    <p class="sub-info">오늘 학습할 단어는 총 <strong>${todayWords.size()}</strong>개입니다.</p>
+
+    <c:if test="${empty todayWords}">
+        <p>���� �н��� �ܾ �����ϴ�. (��ǥ�� �������ּ���!)</p>
+        <button class="secondary" onclick="location.href='/usr/home/main'">메인으로 돌아가기</button>
+    </c:if>
+
+    <c:if test="${not empty todayWords}">
+        <!-- 퀴즈 데이터(JSON) -->
+        <script type="application/json" id="wordsJsonData">
+            <c:out value="${wordsJson}" escapeXml="false"/>
+        </script>
+
+        <div class="quiz-card">
+            <div class="progress" id="progress"></div>
+            <!-- ? �ʱ� �ؽ�Ʈ ���� -->
+            <div class="question" id="question"></div>
+            <div class="option-list" id="options"></div>
+            <div class="feedback" id="feedback"></div>
+            <div class="controls">
+                <button class="primary" id="nextBtn" onclick="nextQuestion()" disabled>���� ����</button>
+                <button class="secondary" onclick="location.href='/usr/home/main'">메인으로 돌아가기</button>
+            </div>
+        </div>
+
+                <script>
+            // ===============================
+            // ���� ��ũ��Ʈ (Ȯ��)
+            // init -> buildQuestions -> render -> nextQuestion ����
+            // ===============================
+
+            const DEBUG = true;
+            const dlog = (...args) => { if (DEBUG) console.log(...args); };
+
+            const QUESTION_TYPES = {
+                MCQ_MEANING: 'MCQ_MEANING',      // EN -> KO ������
+                MCQ_WORD: 'MCQ_WORD',            // KO -> EN ������
+                CLOZE: 'CLOZE',                  // ���� ��ĭ 4������
+                SPELLING_INPUT: 'SPELLING_INPUT',// �� ���� ö�� �Է�
+                SCRAMBLE: 'SCRAMBLE',            // ���� ���� -> ���ܾ� �Է�
+                MATCH: 'MATCH',                  // ��Ī ����
+                LISTEN_MCQ: 'LISTEN_MCQ'         // ��� �ܾ� �����
+            };
+
+            function normalize(val) {
+                if (val === undefined || val === null) return '';
+                const trimmed = String(val).replace(/\r|\n/g, ' ').trim();
+                if (trimmed.toLowerCase() === 'null') return '';
+                return trimmed;
+            }
+
+            const progressEl = document.getElementById('progress');
+            const questionEl = document.getElementById('question');
+            const optionsEl  = document.getElementById('options');
+            const feedbackEl = document.getElementById('feedback');
+            const nextBtn    = document.getElementById('nextBtn');
+
+            const jsonTag = document.getElementById('wordsJsonData');
+            if (!jsonTag) {
+                progressEl.textContent = '���� �����͸� �ҷ����� ���߽��ϴ�.';
+                nextBtn.disabled = true;
+                console.error('wordsJsonData �±װ� �����ϴ�.');
+            } else {
+                const rawJson = jsonTag.textContent || '[]';
+
+                let baseWords = [];
+                try {
+                    baseWords = JSON.parse(rawJson);
+                } catch (e) {
+                    console.error('���� ������ �Ľ� ����', e, rawJson);
+                    baseWords = [];
+                }
+
+                // --- words ����ȭ ---
+                const words = baseWords
+                    .map(w => {
+                        const en = normalize(w.spelling);
+                        const ko = normalize(w.meaning);
+                        const exampleSentence = normalize(w.exampleSentence || w.example);
+                        const audioPath = normalize(w.audioPath || w.audio || w.tts);
+                        return {
+                            id: (w.id ?? -1),
+                            en,
+                            ko,
+                            exampleSentence,
+                            audioPath
+                        };
+                    })
+                    .filter(w => w.en && w.ko);
+
+                dlog('rawJson length=', rawJson.length);
+                dlog('baseWords[0]=', baseWords[0]);
+                dlog('words[0]=', words[0]);
+
+                let questions = [];
+                let currentIndex = 0;
+                let answered = false;
+                let matchState = null;
+
+                function shuffle(arr) {
+                    for (let i = arr.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [arr[i], arr[j]] = [arr[j], arr[i]];
+                    }
+                    return arr;
+                }
+
+                function pickDistractors(targetWord, targetField, count) {
+                    const targetVal = (targetWord[targetField] || '').trim();
+                    const pool = [];
+                    const seen = new Set();
+                    words.forEach(w => {
+                        const val = (w[targetField] || '').trim();
+                        if (!val || w.id === targetWord.id || val === targetVal) return;
+                        if (seen.has(val)) return;
+                        seen.add(val);
+                        const diff = Math.abs(val.length - targetVal.length);
+                        pool.push({ val, diff });
+                    });
+                    pool.sort((a, b) => a.diff - b.diff);
+                    return shuffle(pool.slice(0, Math.max(count * 2, count + 1))).slice(0, count).map(p => p.val);
+                }
+
+                function buildMcqOptions(word, targetField) {
+                    const others = pickDistractors(word, targetField, 3);
+                    const correct = (word[targetField] || '').trim();
+                    const set = new Set(others);
+                    set.add(correct);
+                    const opts = Array.from(set);
+                    if (opts.length < 4) return null;
+                    return shuffle(opts.slice(0, 4));
+                }
+
+                // ���� ��� ����
+                const builders = {
+                    [QUESTION_TYPES.MCQ_MEANING]: function makeMcqMeaningQuestion(word) {
+                        const options = buildMcqOptions(word, 'ko');
+                        if (!options) return null;
+                        return {
+                            type: QUESTION_TYPES.MCQ_MEANING,
+                            direction: 'EN_TO_KO',
+                            prompt: word.en,
+                            options,
+                            answer: word.ko,
+                            word
+                        };
+                    },
+                    [QUESTION_TYPES.MCQ_WORD]: function makeMcqWordQuestion(word) {
+                        const options = buildMcqOptions(word, 'en');
+                        if (!options) return null;
+                        return {
+                            type: QUESTION_TYPES.MCQ_WORD,
+                            direction: 'KO_TO_EN',
+                            prompt: word.ko,
+                            options,
+                            answer: word.en,
+                            word
+                        };
+                    },
+                    [QUESTION_TYPES.CLOZE]: function makeClozeQuestion(word) {
+                        if (!word.exampleSentence) return null;
+                        const escaped = word.en.replace(/[.*+?^$\\{\\}()|[\\]\\\\]/g, '\\$&');
+                        const regex = new RegExp(escaped, 'i');
+                        if (!regex.test(word.exampleSentence)) return null;
+                        const clozeText = word.exampleSentence.replace(regex, '____');
+                        if (clozeText === word.exampleSentence) return null;
+                        const options = buildMcqOptions(word, 'en');
+                        if (!options) return null;
+                        return {
+                            type: QUESTION_TYPES.CLOZE,
+                            prompt: '��ĭ�� �� ���� �˸��� �ܾ��?',
+                            clozeText,
+                            options,
+                            answer: word.en,
+                            word
+                        };
+                    },
+                    [QUESTION_TYPES.SPELLING_INPUT]: function makeSpellingInputQuestion(word) {
+                        if (!word.ko || !word.en) return null;
+                        return {
+                            type: QUESTION_TYPES.SPELLING_INPUT,
+                            prompt: '��: ' + word.ko,
+                            answer: word.en,
+                            word
+                        };
+                    },
+                    [QUESTION_TYPES.SCRAMBLE]: function makeScrambleQuestion(word) {
+                        if (!word.en || word.en.length <= 3) return null;
+                        const scrambled = scrambleWord(word.en);
+                        if (!scrambled || scrambled.toLowerCase() === word.en.toLowerCase()) return null;
+                        return {
+                            type: QUESTION_TYPES.SCRAMBLE,
+                            prompt: '���� ����: ' + scrambled,
+                            answer: word.en,
+                            word
+                        };
+                    },
+                    [QUESTION_TYPES.MATCH]: function makeMatchQuestion() {
+                        const pool = words.filter(w => w.en && w.ko);
+                        if (pool.length < 4) return null;
+                        const max = Math.min(6, pool.length);
+                        const min = 4;
+                        const count = Math.min(max, min + Math.floor(Math.random() * (max - min + 1)));
+                        const picks = shuffle([...pool]).slice(0, count);
+                        if (picks.length < 4) return null;
+                        const pairs = picks.map(w => ({ spelling: w.en, meaning: w.ko }));
+                        return {
+                            type: QUESTION_TYPES.MATCH,
+                            prompt: '����-���� ��� ���纸����.',
+                            pairs,
+                            words: picks
+                        };
+                    },
+                    [QUESTION_TYPES.LISTEN_MCQ]: function makeListenMcqQuestion(word) {
+                        if (!word.audioPath) return null;
+                        const options = buildMcqOptions(word, 'en');
+                        if (!options) return null;
+                        return {
+                            type: QUESTION_TYPES.LISTEN_MCQ,
+                            prompt: '������ ��� �´� �ܾ �������.',
+                            options,
+                            answer: word.en,
+                            word
+                        };
+                    }
+                };
+
+                function scrambleWord(text) {
+                    const chars = text.split('');
+                    let scrambled = text;
+                    let guard = 0;
+                    while (scrambled.toLowerCase() === text.toLowerCase() && guard < 10) {
+                        shuffle(chars);
+                        scrambled = chars.join('');
+                        guard += 1;
+                    }
+                    return scrambled;
+                }
+
+                function buildQuestions() {
+                    const qs = [];
+                    const plan = [
+                        { type: QUESTION_TYPES.MCQ_MEANING, count: 3 },
+                        { type: QUESTION_TYPES.MCQ_WORD, count: 2 },
+                        { type: QUESTION_TYPES.CLOZE, count: 2 },
+                        { type: QUESTION_TYPES.SPELLING_INPUT, count: 2 },
+                        { type: QUESTION_TYPES.SCRAMBLE, count: 1 },
+                        { type: QUESTION_TYPES.LISTEN_MCQ, count: 1 },
+                        { type: QUESTION_TYPES.MATCH, count: 1 }
+                    ];
+
+                    plan.forEach(item => {
+                        let created = 0;
+                        let attempts = 0;
+                        const guard = Math.max(10, words.length * 3);
+                        const pool = shuffle([...words]);
+                        while (created < item.count && attempts < guard && pool.length) {
+                            const target = pool[attempts % pool.length];
+                            const builder = builders[item.type];
+                            if (builder) {
+                                const q = item.type === QUESTION_TYPES.MATCH ? builder() : builder(target);
+                                if (q && isValidQuestion(q)) {
+                                    qs.push(q);
+                                    created += 1;
+                                }
+                            }
+                            attempts += 1;
+                        }
+                    });
+
+                    const maxQuestions = 10;
+                    let attempts = 0;
+                    while (qs.length < maxQuestions && attempts < words.length * 2) {
+                        const w = words[attempts % words.length];
+                        const q = builders[QUESTION_TYPES.MCQ_MEANING](w);
+                        if (q && isValidQuestion(q)) {
+                            qs.push(q);
+                        }
+                        attempts += 1;
+                    }
+
+                    const cleaned = shuffle(qs.filter(isValidQuestion));
+                    return cleaned.slice(0, maxQuestions);
+                }
+
+                function isValidQuestion(q) {
+                    if (!q || !q.type) return false;
+                    const hasPrompt = q.prompt && String(q.prompt).trim();
+                    switch (q.type) {
+                        case QUESTION_TYPES.MCQ_MEANING:
+                        case QUESTION_TYPES.MCQ_WORD:
+                        case QUESTION_TYPES.CLOZE:
+                        case QUESTION_TYPES.LISTEN_MCQ:
+                            return hasPrompt && Array.isArray(q.options) && q.options.length === 4 && q.answer;
+                        case QUESTION_TYPES.SPELLING_INPUT:
+                        case QUESTION_TYPES.SCRAMBLE:
+                            return hasPrompt && q.answer;
+                        case QUESTION_TYPES.MATCH:
+                            return hasPrompt && Array.isArray(q.pairs) && q.pairs.length >= 4;
+                        default:
+                            return false;
+                    }
+                }
+
+                function clearUI(msg) {
+                    progressEl.textContent = msg || '';
+                    questionEl.innerHTML = '';
+                    optionsEl.innerHTML = '';
+                    feedbackEl.textContent = '';
+                    feedbackEl.style.color = '';
+                    nextBtn.disabled = true;
+                    matchState = null;
+                }
+
+                function setQuestionLines(lines) {
+                    questionEl.innerHTML = '';
+                    lines.forEach((line, idx) => {
+                        const div = document.createElement('div');
+                        div.textContent = line;
+                        if (idx === 0) div.style.fontWeight = 'bold';
+                        questionEl.appendChild(div);
+                    });
+                }
+
+                function renderMcq(q) {
+                    optionsEl.innerHTML = '';
+                    q.options.forEach(label => {
+                        const btn = document.createElement('button');
+                        btn.className = 'option-btn';
+                        btn.textContent = label;
+                        btn.onclick = () => selectAnswer(btn, label, q);
+                        optionsEl.appendChild(btn);
+                    });
+                }
+
+                function renderInput(q) {
+                    optionsEl.innerHTML = '';
+                    const wrap = document.createElement('div');
+                    wrap.className = 'input-wrap';
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.className = 'text-input';
+                    input.placeholder = '������ �Է��ϼ���';
+                    const submit = document.createElement('button');
+                    submit.className = 'primary';
+                    submit.textContent = '����';
+                    const handler = () => checkInputAnswer(q, input);
+                    submit.onclick = handler;
+                    input.onkeydown = (e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handler();
+                        }
+                    };
+                    wrap.appendChild(input);
+                    wrap.appendChild(submit);
+                    optionsEl.appendChild(wrap);
+                    input.focus();
+                }
+
+                function renderMatch(q) {
+                    optionsEl.innerHTML = '';
+                    matchState = {
+                        question: q,
+                        leftSelection: null,
+                        rightSelection: null,
+                        matched: new Set()
+                    };
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'match-grid';
+
+                    const leftCol = document.createElement('div');
+                    leftCol.className = 'match-col';
+                    const rightCol = document.createElement('div');
+                    rightCol.className = 'match-col';
+
+                    const rightOptions = shuffle(q.pairs.map(p => p.meaning));
+                    q.rightOptions = rightOptions;
+
+                    q.pairs.forEach((pair, idx) => {
+                        const btn = document.createElement('button');
+                        btn.className = 'match-item';
+                        btn.dataset.side = 'left';
+                        btn.dataset.index = String(idx);
+                        btn.textContent = pair.spelling;
+                        btn.onclick = () => handleMatchSelection('left', idx);
+                        leftCol.appendChild(btn);
+                    });
+
+                    rightOptions.forEach((meaning, idx) => {
+                        const btn = document.createElement('button');
+                        btn.className = 'match-item';
+                        btn.dataset.side = 'right';
+                        btn.dataset.index = String(idx);
+                        btn.textContent = meaning;
+                        btn.onclick = () => handleMatchSelection('right', idx);
+                        rightCol.appendChild(btn);
+                    });
+
+                    wrapper.appendChild(leftCol);
+                    wrapper.appendChild(rightCol);
+                    optionsEl.appendChild(wrapper);
+                }
+
+                function handleMatchSelection(side, idx) {
+                    if (!matchState || answered) return;
+                    const { question } = matchState;
+                    const selector = `.match-item[data-side="${side}"][data-index="${idx}"]`;
+                    const btn = optionsEl.querySelector(selector);
+                    if (!btn || btn.classList.contains('matched')) return;
+
+                    if (side === 'left') {
+                        matchState.leftSelection = idx;
+                    } else {
+                        matchState.rightSelection = idx;
+                    }
+
+                    optionsEl.querySelectorAll('.match-item.selected').forEach(el => el.classList.remove('selected'));
+                    if (matchState.leftSelection !== null) {
+                        const l = optionsEl.querySelector(`.match-item[data-side="left"][data-index="${matchState.leftSelection}"]`);
+                        if (l) l.classList.add('selected');
+                    }
+                    if (matchState.rightSelection !== null) {
+                        const r = optionsEl.querySelector(`.match-item[data-side="right"][data-index="${matchState.rightSelection}"]`);
+                        if (r) r.classList.add('selected');
+                    }
+
+                    if (matchState.leftSelection === null || matchState.rightSelection === null) return;
+
+                    const leftIdx = matchState.leftSelection;
+                    const rightIdx = matchState.rightSelection;
+                    const leftPair = question.pairs[leftIdx];
+                    const rightMeaning = question.rightOptions[rightIdx];
+                    const leftBtn = optionsEl.querySelector(`.match-item[data-side="left"][data-index="${leftIdx}"]`);
+                    const rightBtn = optionsEl.querySelector(`.match-item[data-side="right"][data-index="${rightIdx}"]`);
+                    const isCorrect = leftPair && rightMeaning && leftPair.meaning === rightMeaning;
+
+                    if (isCorrect) {
+                        [leftBtn, rightBtn].forEach(el => { if (el) el.classList.add('matched'); });
+                        matchState.matched.add(leftIdx + ':' + rightIdx);
+                        matchState.leftSelection = null;
+                        matchState.rightSelection = null;
+                        optionsEl.querySelectorAll('.match-item.selected').forEach(el => el.classList.remove('selected'));
+                        if (matchState.matched.size >= question.pairs.length) {
+                            answered = true;
+                            feedbackEl.textContent = '��� ¦�� ������!';
+                            feedbackEl.style.color = '#2e7d32';
+                            nextBtn.disabled = (currentIndex >= questions.length - 1);
+                        }
+                    } else {
+                        [leftBtn, rightBtn].forEach(el => { if (el) el.classList.add('wrong'); });
+                        setTimeout(() => {
+                            [leftBtn, rightBtn].forEach(el => {
+                                if (el) {
+                                    el.classList.remove('wrong', 'selected');
+                                }
+                            });
+                            matchState.leftSelection = null;
+                            matchState.rightSelection = null;
+                        }, 400);
+                    }
+                }
+
+                function checkInputAnswer(q, inputEl) {
+                    if (answered) return;
+                    const user = normalize(inputEl.value).toLowerCase();
+                    if (!user) {
+                        feedbackEl.textContent = '���� �Է����ּ���.';
+                        feedbackEl.style.color = '#c62828';
+                        return;
+                    }
+                    const correctAns = normalize(q.answer).toLowerCase();
+                    answered = true;
+                    if (user === correctAns) {
+                        feedbackEl.textContent = '�����Դϴ�!';
+                        feedbackEl.style.color = '#2e7d32';
+                    } else {
+                        feedbackEl.textContent = `Ʋ�Ⱦ��. ������ "${q.answer}" �Դϴ�.`;
+                        feedbackEl.style.color = '#c62828';
+                    }
+                    nextBtn.disabled = (currentIndex >= questions.length - 1);
+                }
+
+                function selectAnswer(button, chosen, q) {
+                    if (answered) return;
+                    if (q.type !== QUESTION_TYPES.MCQ_MEANING &&
+                        q.type !== QUESTION_TYPES.MCQ_WORD &&
+                        q.type !== QUESTION_TYPES.CLOZE &&
+                        q.type !== QUESTION_TYPES.LISTEN_MCQ) {
+                        return;
+                    }
+                    answered = true;
+
+                    const buttons = optionsEl.querySelectorAll('.option-btn');
+                    buttons.forEach(btn => {
+                        btn.disabled = true;
+                        if (btn.textContent === q.answer) btn.classList.add('correct');
+                    });
+
+                    if (chosen === q.answer) {
+                        feedbackEl.textContent = '�����Դϴ�!';
+                        feedbackEl.style.color = '#2e7d32';
+                    } else {
+                        feedbackEl.textContent = `Ʋ�Ⱦ��. ������ "${q.answer}" �Դϴ�.`;
+                        feedbackEl.style.color = '#c62828';
+                        button.classList.add('wrong');
+                    }
+
+                    nextBtn.disabled = (currentIndex >= questions.length - 1);
+                }
+
+                function render() {
+                    if (!questions || !questions.length) {
+                        return clearUI('������ ������ �����ϴ�.');
+                    }
+
+                    let guard = 0;
+                    while (guard < questions.length) {
+                        const q = questions[currentIndex];
+                        const promptText = String(q?.prompt ?? '').trim();
+
+                        if (isValidQuestion(q) && promptText) {
+                            answered = false;
+                            nextBtn.disabled = true;
+                            feedbackEl.textContent = '';
+                            feedbackEl.style.color = '';
+
+                            const directionText = q.direction === 'EN_TO_KO'
+                                ? '���� �� �ѱ� ����'
+                                : q.direction === 'KO_TO_EN'
+                                    ? '�ѱ� �� ���� ����'
+                                    : q.type === QUESTION_TYPES.MATCH
+                                        ? '��Ī'
+                                        : '�ְ���/��Ÿ';
+
+                            const total = Array.isArray(questions) ? questions.length : 0;
+                            let progressText = '���� ' + (currentIndex + 1) + ' / ' + total;
+                            if (directionText) progressText += ' �� ' + directionText;
+                            progressEl.textContent = progressText;
+
+                            optionsEl.innerHTML = '';
+                            questionEl.innerHTML = '';
+                            matchState = null;
+
+                            switch (q.type) {
+                                case QUESTION_TYPES.MCQ_MEANING:
+                                    questionEl.textContent = `���� "${promptText}"�� ���� �������.`;
+                                    renderMcq(q);
+                                    break;
+                                case QUESTION_TYPES.MCQ_WORD:
+                                    questionEl.textContent = `�ѱ� "${promptText}"�� �ش��ϴ� ���� �ܾ �������.`;
+                                    renderMcq(q);
+                                    break;
+                                case QUESTION_TYPES.CLOZE:
+                                    setQuestionLines([q.prompt]);
+                                    const clozeLine = document.createElement('div');
+                                    clozeLine.className = 'cloze-line';
+                                    clozeLine.textContent = q.clozeText;
+                                    questionEl.appendChild(clozeLine);
+                                    renderMcq(q);
+                                    break;
+                                case QUESTION_TYPES.LISTEN_MCQ:
+                                    setQuestionLines([q.prompt]);
+                                    const audioWrap = document.createElement('div');
+                                    audioWrap.className = 'audio-wrap';
+                                    const playBtn = document.createElement('button');
+                                    playBtn.className = 'secondary';
+                                    playBtn.textContent = '���';
+                                    const audio = new Audio(q.word.audioPath);
+                                    playBtn.onclick = () => {
+                                        audio.currentTime = 0;
+                                        audio.play().catch(err => console.error('audio play error', err));
+                                    };
+                                    audioWrap.appendChild(playBtn);
+                                    optionsEl.appendChild(audioWrap);
+                                    renderMcq(q);
+                                    break;
+                                case QUESTION_TYPES.SPELLING_INPUT:
+                                case QUESTION_TYPES.SCRAMBLE:
+                                    setQuestionLines([
+                                        q.type === QUESTION_TYPES.SPELLING_INPUT
+                                            ? q.prompt
+                                            : '���� ���ڸ� ���� �ܾ �Է��ϼ���.',
+                                        q.type === QUESTION_TYPES.SCRAMBLE ? q.prompt : ''
+                                    ].filter(Boolean));
+                                    renderInput(q);
+                                    break;
+                                case QUESTION_TYPES.MATCH:
+                                    setQuestionLines([q.prompt]);
+                                    renderMatch(q);
+                                    break;
+                                default:
+                                    return clearUI('��ȿ�� ������ �����ϴ�.');
+                            }
+                            return;
+                        }
+
+                        console.warn('skip invalid/empty prompt question', q);
+                        currentIndex += 1;
+                        guard += 1;
+
+                        if (currentIndex >= questions.length) break;
+                    }
+
+                    return clearUI('��ȿ�� ������ �����ϴ�.');
+                }
+
+                function moveNext() {
+                    currentIndex += 1;
+                    if (currentIndex >= questions.length) {
+                        return clearUI('��ȿ�� ������ �����ϴ�.');
+                    }
+                    render();
+                }
+
+                window.nextQuestion = moveNext;
+
+                (function init() {
+                    if (!words.length) {
+                        return clearUI('������ �ܾ �����ϴ�.');
+                    }
+
+                    questions = buildQuestions();
+
+                    const bad = questions.filter(q => !isValidQuestion(q));
+                    console.log('bad questions count =', bad.length, bad[0]);
+                    if (bad.length) {
+                        console.warn('Removing bad questions', bad);
+                        questions = questions.filter(isValidQuestion);
+                    }
+
+                    currentIndex = 0;
+                    dlog('questions[0]=', questions[0]);
+
+                    render();
+                })();
+            }
+        </script>
+    </c:if>
+
+</body>
+</html>
+
+
+
+
+
+
+

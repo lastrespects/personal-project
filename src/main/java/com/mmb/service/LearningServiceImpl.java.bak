@@ -1,0 +1,297 @@
+﻿package com.mmb.service;
+
+import com.mmb.api.TranslationClient;
+import com.mmb.api.ExampleClient;
+import com.mmb.service.LocalMeaningDictionary;
+import com.mmb.dto.TodayWordDto;
+import com.mmb.entity.Member;
+import com.mmb.entity.StudyRecord;
+import com.mmb.entity.Word;
+import com.mmb.repository.MemberRepository;
+import com.mmb.repository.StudyRecordRepository;
+import com.mmb.repository.WordRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class LearningServiceImpl implements LearningService {
+    private static final Map<String, String> LOCAL_MEANINGS = LocalMeaningDictionary.MEANINGS;
+    private final MemberRepository memberRepository;
+    private final StudyRecordRepository studyRecordRepository;
+    private final WordGenerationService wordGenerationService;
+    private final TranslationClient translationClient;
+    private final ExampleClient exampleClient;
+    private final WordRepository wordRepository;
+
+    @Override
+    @Transactional
+    public List<TodayWordDto> prepareTodayWords(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("???뜚??鈺곕똻???? ??녿뮸??덈뼄. ID=" + memberId));
+
+        int targetCount = Optional.ofNullable(member.getDailyTarget()).orElse(30);
+
+        // 1) ???????뜚??筌뤴뫀諭???덈뮸 疫꿸퀡以?鈺곌퀬??
+        List<StudyRecord> allRecords = studyRecordRepository.findByMemberId(memberId);
+        Set<Long> existingWordIds = allRecords.stream()
+                .filter(r -> r.getWord() != null)
+                .map(r -> r.getWord().getId())
+                .collect(Collectors.toSet());
+
+        // 2) ??삳뮎 癰귣벊???곷튊 ????λ선 ?곕뗄??(SRS)
+        List<StudyRecord> dueRecords = allRecords.stream()
+                .filter(this::isDueForReview)
+                .sorted(this::comparePriority)
+                .limit(targetCount)
+                .toList();
+
+        LinkedHashMap<Long, TodayWordDto> uniqMap = new LinkedHashMap<>();
+
+        for (StudyRecord record : dueRecords) {
+            Word w = record.getWord();
+            String meaning = resolveMeaning(w);
+            String example = resolveExample(w);
+            uniqMap.put(w.getId(), TodayWordDto.builder()
+                    .wordId(w.getId())
+                    .spelling(w.getSpelling())
+                    .meaning(meaning)
+                    .exampleSentence(example)
+                    .audioPath(w.getAudioPath())
+                    .review(true)
+                    .build());
+        }
+
+        int remain = targetCount - uniqMap.size();
+
+        // 3) ?봔鈺곌퉲釉?쭖?????λ선 ??밴쉐
+        if (remain > 0) {
+            List<Word> newWords = wordGenerationService.generateNewWordsForMember(member, remain, existingWordIds);
+            for (Word w : newWords) {
+
+                StudyRecord record = StudyRecord.builder()
+                        .member(member)
+                        .word(w)
+                        .totalAttempts(0)
+                        .totalCorrect(0)
+                        .lastStudiedAt(null)
+                        .nextReviewAt(null)
+                        .correctStreak(0)
+                        .easeFactor(2.5)
+                        .intervalDays(0)
+                        .build();
+                studyRecordRepository.save(record);
+
+                String meaning = resolveMeaning(w);
+                String example = resolveExample(w);
+                uniqMap.put(w.getId(), TodayWordDto.builder()
+                        .wordId(w.getId())
+                        .spelling(w.getSpelling())
+                        .meaning(meaning)
+                        .exampleSentence(example)
+                        .audioPath(w.getAudioPath())
+                        .review(false)
+                        .build());
+            }
+        }
+
+        // ?袁⑹뒄 ???곕떽? ??밴쉐??곗쨮 筌?쑴??묾?(餓λ쵎????볤탢 ???봔鈺곌퉭??癰귣똻??
+        int stillNeed = targetCount - uniqMap.size();
+        if (stillNeed > 0) {
+            Set<Long> exclude = uniqMap.keySet();
+            List<Word> extra = wordGenerationService.generateNewWordsForMember(member, stillNeed, exclude);
+            for (Word w : extra) {
+                if (uniqMap.containsKey(w.getId()))
+                    continue;
+                StudyRecord record = StudyRecord.builder()
+                        .member(member)
+                        .word(w)
+                        .totalAttempts(0)
+                        .totalCorrect(0)
+                        .lastStudiedAt(null)
+                        .nextReviewAt(null)
+                        .correctStreak(0)
+                        .easeFactor(2.5)
+                        .intervalDays(0)
+                        .build();
+                studyRecordRepository.save(record);
+                String meaning = resolveMeaning(w);
+                String example = resolveExample(w);
+                uniqMap.put(w.getId(), TodayWordDto.builder()
+                        .wordId(w.getId())
+                        .spelling(w.getSpelling())
+                        .meaning(meaning)
+                        .exampleSentence(example)
+                        .audioPath(w.getAudioPath())
+                        .review(false)
+                        .build());
+                if (uniqMap.size() >= targetCount)
+                    break;
+            }
+        }
+
+        return new java.util.ArrayList<>(uniqMap.values());
+    }
+
+    @Override
+    @Transactional
+    public void recordResult(Long memberId, Long wordId, boolean correct) {
+        StudyRecord record = studyRecordRepository
+                .findByMemberIdAndWordId(memberId, wordId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "??덈뮸 疫꿸퀡以????곷뮸??덈뼄. memberId=" + memberId + ", wordId=" + wordId));
+
+        record.setTotalAttempts(record.getTotalAttempts() + 1);
+        if (correct) {
+            record.setTotalCorrect(record.getTotalCorrect() + 1);
+            record.setCorrectStreak(record.getCorrectStreak() + 1);
+        } else {
+            record.setCorrectStreak(0);
+        }
+        record.setLastStudiedAt(LocalDateTime.now());
+        record.setNextReviewAt(LocalDateTime.now().plusDays(1));
+    }
+
+    // =============================
+    // SRS ?온????? 嚥≪뮇彛?
+    // =============================
+
+    /**
+     * ????λ선揶쎛 ??삳뮎 癰귣벊?????怨몄뵥筌왖 ???
+     */
+    private boolean isDueForReview(StudyRecord record) {
+        if (record.getLastReviewDate() == null || record.getTotalAttempts() == 0) {
+            return false; // ?袁⑹춦 癰?????용뮉 ??λ선??"癰귣벊?????? ?袁⑤뻷
+        }
+
+        int correct = record.getCorrectCount();
+        int incorrect = record.getIncorrectCount();
+        int score = correct - incorrect;
+
+        int intervalDays;
+        if (score <= 0) {
+            intervalDays = 1; // ???????λ선: ??롳펷筌띾뜄??
+        } else if (score <= 2) {
+            intervalDays = 2;
+        } else if (score <= 4) {
+            intervalDays = 4;
+        } else {
+            intervalDays = 7; // ?겸뫖??????뿺 ??λ선: 7??곗춳??
+        }
+
+        LocalDateTime nextReviewDate = record.getLastReviewDate().plusDays(intervalDays);
+        return !nextReviewDate.isAfter(LocalDateTime.now());
+    }
+
+    /**
+     * ??堉???λ선???믪눘? 癰귣똻肉т빳袁? ?類ｌ졊 疫꿸퀣?
+     */
+    private int comparePriority(StudyRecord a, StudyRecord b) {
+        int scoreA = a.getCorrectCount() - a.getIncorrectCount();
+        int scoreB = b.getCorrectCount() - b.getIncorrectCount();
+
+        if (scoreA != scoreB) {
+            return Integer.compare(scoreA, scoreB); // ?癒?땾 ???(??롫군) ??λ선 ?믪눘?
+        }
+
+        LocalDateTime dateA = a.getLastReviewDate();
+        LocalDateTime dateB = b.getLastReviewDate();
+
+        if (dateA == null && dateB != null)
+            return -1;
+        if (dateA != null && dateB == null)
+            return 1;
+        if (dateA == null)
+            return 0;
+
+        return dateA.compareTo(dateB);
+    }
+
+    private String resolveMeaning(Word w) {
+        String spelling = w.getSpelling() != null ? w.getSpelling() : "";
+        String meaning = w.getMeaning();
+
+        // 1) ?대? ?쒓? ?살씠 ?덉쑝硫?諛붾줈 諛섑솚
+        if (meaning != null && !meaning.isBlank() && !"null".equalsIgnoreCase(meaning)) {
+            // ?쒓????ы븿?섏뼱 ?덈뒗吏 泥댄겕
+            boolean hasKorean = meaning.chars()
+                    .anyMatch(c -> (c >= 0xAC00 && c <= 0xD7A3) || (c >= 0x1100 && c <= 0x11FF));
+            if (hasKorean) {
+                return meaning;
+            }
+        }
+
+        // 2) 濡쒖뺄 ?ъ쟾?먯꽌 李얘린
+        String local = LOCAL_MEANINGS.get(spelling.toLowerCase());
+        if (local != null && !local.isBlank()) {
+            w.setMeaning(local);
+            wordRepository.save(w);
+            return local;
+        }
+
+        // 3) 踰덉뿭 API ?몄텧
+        try {
+            String translated = translationClient.translateToKorean(spelling);
+            if (translated != null && !translated.isBlank() && !translated.equalsIgnoreCase(spelling)) {
+                // 踰덉뿭 寃곌낵媛 ?쒓??몄? ?뺤씤
+                boolean translatedHasKorean = translated.chars()
+                        .anyMatch(c -> (c >= 0xAC00 && c <= 0xD7A3) || (c >= 0x1100 && c <= 0x11FF));
+                if (translatedHasKorean) {
+                    w.setMeaning(translated);
+                    wordRepository.save(w);
+                    return translated;
+                }
+            }
+        } catch (Exception ignored) {
+        }
+
+        // 4) 理쒗썑???섎떒: ?쒓? ?살씠 ?놁쑝硫?"(???놁쓬)" 諛섑솚
+        return "(???놁쓬)";
+    }
+
+    private String resolveExample(Word w) {
+        String current = w.getExampleSentence();
+        if (current != null && !current.isBlank() && !"null".equalsIgnoreCase(current)) {
+            // ?대? ?댁꽍??遺숈뼱 ?덈떎硫?洹몃?濡?諛섑솚
+            if (current.contains("?댁꽍:")) {
+                return current;
+            }
+            return appendKoTranslation(current);
+        }
+        try {
+            return exampleClient.fetchExample(w.getSpelling())
+                    .map(ex -> {
+                        String withKo = appendKoTranslation(ex);
+                        w.setExampleSentence(withKo);
+                        wordRepository.save(w);
+                        return withKo;
+                    })
+                    .orElse("");
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private String appendKoTranslation(String exampleEn) {
+        try {
+            String ko = translationClient.translateToKorean(exampleEn);
+            // DeepL???ㅽ뙣?섎㈃ ?숈씪???곷Ц??諛섑솚?????덉쑝誘濡?以묐났 諛⑹?
+            if (ko != null && !ko.isBlank() && !exampleEn.equals(ko)) {
+                return exampleEn + " / ?댁꽍: " + ko;
+            }
+        } catch (Exception ignored) {
+        }
+        return exampleEn;
+    }
+
+}
+

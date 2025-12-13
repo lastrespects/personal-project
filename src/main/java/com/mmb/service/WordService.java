@@ -2,7 +2,7 @@ package com.mmb.service;
 
 import com.mmb.api.DictionaryApiClient;
 import com.mmb.api.DictionaryApiClient.DictionaryWordInfo;
-import com.mmb.api.DeepLTranslationClient;
+import com.mmb.api.TranslationClient;
 import com.mmb.api.RandomWordClient;
 import com.mmb.entity.Word;
 import com.mmb.repository.WordRepository;
@@ -21,7 +21,7 @@ public class WordService {
     private final WordRepository wordRepository;
     private final RandomWordClient randomWordClient;
     private final DictionaryApiClient dictionaryApiClient;
-    private final DeepLTranslationClient translationClient;
+    private final TranslationClient translationClient;
 
     @PostConstruct
     @Transactional
@@ -53,9 +53,7 @@ public class WordService {
                 continue;
 
             String englishDef = info.getDefinition();
-            String korean = translationClient.translateEnToKo(englishDef);
-            if (korean == null || korean.isBlank())
-                korean = englishDef;
+            String korean = translationClient.translateToKorean(englishDef);
 
             Word entity = Word.builder()
                     .spelling(info.getSpelling())

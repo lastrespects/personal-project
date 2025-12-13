@@ -1,21 +1,23 @@
-// src/main/java/com/mmb/api/DictionaryResponse.java
 package com.mmb.api;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
-/**
- * DictionaryAPI.dev 응답을 단순화한 DTO
- */
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class DictionaryResponse {
 
-    private List<Meaning> meanings;
+    private String word;
     private List<Phonetic> phonetics;
+    private List<Meaning> meanings;
 
     public String getFirstDefinitionOrNull() {
         if (meanings == null) return null;
@@ -53,29 +55,28 @@ public class DictionaryResponse {
         return null;
     }
 
-    // 내부 DTO들
-    @Data
+    @Getter
+    @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    @Builder
     public static class Meaning {
         private String partOfSpeech;
         private List<Definition> definitions;
     }
 
-    @Data
+    @Getter
+    @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    @Builder
     public static class Definition {
         private String definition;
         private String example;
     }
 
-    @Data
+    @Getter
+    @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    @Builder
     public static class Phonetic {
         private String text;
         private String audio;

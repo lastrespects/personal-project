@@ -1,11 +1,9 @@
-// src/main/java/com/mmb/api/TranslationClient.java
 package com.mmb.api;
 
 public interface TranslationClient {
 
     /**
-     * 영어 문장을 한국어로 번역
+     * Translate an English sentence to Korean.
      */
     String translateToKorean(String englishText);
 }
-

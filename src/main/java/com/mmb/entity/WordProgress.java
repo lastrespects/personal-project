@@ -1,7 +1,16 @@
 package com.mmb.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
@@ -11,7 +20,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "word_progress", uniqueConstraints = @UniqueConstraint(columnNames = { "member_id", "word_id" }))
 public class WordProgress {
 
     @Id
@@ -19,22 +27,15 @@ public class WordProgress {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "word_id")
     private Word word;
 
-    @Builder.Default
-    private int wrongStreak = 0;
-
-    @Builder.Default
-    private int correctCount = 0;
-
-    @Builder.Default
-    private int wrongCount = 0;
-
-    private LocalDate nextReviewDate;
     private LocalDate lastStudiedDate;
+    private LocalDate nextReviewDate;
+
+    private int correctCount;
+    private int wrongCount;
+    private int wrongStreak;
 }

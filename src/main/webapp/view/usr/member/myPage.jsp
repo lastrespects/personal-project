@@ -18,6 +18,14 @@
         const nextNicknameChangeDate = "${nextNicknameChangeDate}";
         const nicknameDaysLeft = ${nicknameDaysLeft != null ? nicknameDaysLeft : 0};
 
+        function pickRestoreUntil(res) {
+            const root = res || {};
+            const rsData = root.rsData || root.data || (root.resultData && root.resultData.rsData) || {};
+            const v = rsData.restoreUntil ?? rsData.restoreUntilStr ?? rsData.restoreDate ?? rsData.restore_until ?? "";
+            const s = String(v ?? "").trim();
+            return s.length > 0 ? s : "";
+        }
+
         function setMsg(id, text, color) {
             const el = document.getElementById(id);
             if (!el) return;
@@ -143,6 +151,34 @@
 
         function cancelAll() {
             window.location.href = "/usr/home/main";
+        }
+
+        async function withdrawAccount() {
+            const confirmWithdraw = confirm("정말 탈퇴하시겠습니까?\n7일 동안은 같은 계정으로 로그인하면 복구할 수 있습니다.");
+            if (!confirmWithdraw) return;
+
+            try {
+                const res = await fetch("/usr/member/withdraw", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" }
+                }).then(r => r.json());
+
+                console.log("withdraw response:", res);
+
+                const ok = (res && (res.rsCode || res.resultCode || "")).startsWith("S-");
+                if (!ok) {
+                    alert(res?.rsMsg || res?.msg || "회원 탈퇴 처리 중 오류가 발생했습니다.");
+                    return;
+                }
+
+                const restoreUntil = pickRestoreUntil(res);
+                const restoreInfo = restoreUntil.length > 0 ? restoreUntil : "7일 이내";
+
+                alert(`탈퇴가 완료되었습니다.\n${restoreInfo}까지 같은 계정으로 로그인하면 복구할 수 있습니다.\n일주일이 지나면 계정 정보가 완전히 삭제됩니다.`);
+                window.location.href = "/logout";
+            } catch (e) {
+                alert("회원 탈퇴 요청 중 오류가 발생했습니다.");
+            }
         }
     </script>
 </head>

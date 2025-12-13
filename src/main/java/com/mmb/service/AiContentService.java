@@ -1,104 +1,59 @@
 package com.mmb.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mmb.dto.WordContentDto;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class AiContentService {
 
-    @Value("${gemini.api.key:}")
-    private String geminiApiKey;
-
-    @Value("${gemini.api.url:https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent}")
-    private String geminiApiUrl;
-
-    private final RestTemplate restTemplate = new RestTemplate();
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
-    public WordContentDto generateWordContent(String word) {
-        if (geminiApiKey == null || geminiApiKey.isBlank()) {
-            log.warn("Gemini API Key is missing. Returning fallback content.");
-            return WordContentDto.builder()
-                    .word(word)
-                    .meaning("API Key Missing")
-                    .exampleSentence("Please configure your Gemini API Key.")
-                    .build();
+    /**
+     * 예문/간단 문장을 만들어 달라는 프롬프트를 받고
+     * 아주 단순한 영어 문장 하나를 돌려주는 더미 메서드입니다.
+     *
+     * 나중에 진짜 OpenAI, HuggingFace 같은 API를 붙일 때
+     * 이 메서드 안의 구현만 교체하면 됩니다.
+     */
+    public String generateSimpleText(String prompt) {
+        if (prompt == null || prompt.isBlank()) {
+            return "";
         }
 
+        // 프롬프트 안에 '단어'가 작은따옴표('word')로 들어오는 경우 추출
+        String keyword = extractWordFromPrompt(prompt);
+
+        if (keyword == null || keyword.isBlank()) {
+            // 단어를 못 찾으면 그냥 안전한 기본 문장
+            return "This is an example sentence.";
+        }
+
+        // 아주 단순한 예문 생성 (영어 한 문장만)
+        // -> ExampleSentenceService가 여기 결과를 받아서
+        //    번역 클라이언트(TranslationClient)로 한국어 해석을 붙일 거야.
+        return "This is an example sentence using the word \"" + keyword + "\".";
+    }
+
+    /**
+     * 프롬프트 안에서 작은따옴표로 감싸진 단어를 추출합니다.
+     * 예: "단어 'answer'에 대한 예문"  ->  answer
+     */
+    private String extractWordFromPrompt(String prompt) {
         try {
-            // Construct the prompt
-            String promptText = String.format(
-                    "Provide the Korean meaning and a simple English example sentence for the word '%s'. " +
-                            "Return ONLY a JSON object with keys: 'meaning' (Korean string) and 'example' (English string). "
-                            +
-                            "Do not include markdown formatting like ```json.",
-                    word);
+            int first = prompt.indexOf('\'');
+            if (first == -1) return null;
 
-            // Build Request Body for Gemini
-            Map<String, Object> contentPart = new HashMap<>();
-            contentPart.put("text", promptText);
+            int second = prompt.indexOf('\'', first + 1);
+            if (second == -1) return null;
 
-            Map<String, Object> content = new HashMap<>();
-            content.put("parts", List.of(contentPart));
+            String w = prompt.substring(first + 1, second).trim();
+            if (w.isEmpty()) return null;
 
-            Map<String, Object> requestBody = new HashMap<>();
-            requestBody.put("contents", List.of(content));
-
-            // Headers
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
-            // Add API Key as query param or header (Gemini usually takes it as query param
-            // ?key=...)
-            // But for safety, let's append it to the URL if not present
-            String finalUrl = geminiApiUrl;
-            if (!finalUrl.contains("key=")) {
-                finalUrl += "?key=" + geminiApiKey;
-            }
-
-            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
-
-            // Execute Request
-            String response = restTemplate.postForObject(finalUrl, entity, String.class);
-
-            // Parse Response
-            JsonNode root = objectMapper.readTree(response);
-            String responseText = root.path("candidates").get(0).path("content").path("parts").get(0).path("text")
-                    .asText();
-
-            // Clean up potential markdown code blocks if the model ignores the instruction
-            responseText = responseText.replace("```json", "").replace("```", "").trim();
-
-            JsonNode jsonResult = objectMapper.readTree(responseText);
-
-            return WordContentDto.builder()
-                    .word(word)
-                    .meaning(jsonResult.path("meaning").asText())
-                    .exampleSentence(jsonResult.path("example").asText())
-                    .build();
-
+            return w.toLowerCase(Locale.ROOT);
         } catch (Exception e) {
-            log.error("Failed to generate content for word: {}", word, e);
-            return WordContentDto.builder()
-                    .word(word)
-                    .meaning("Generation Failed")
-                    .exampleSentence("Could not generate example.")
-                    .build();
+            log.warn("[AI-CONTENT] failed to extract word from prompt: {}, msg={}", prompt, e.getMessage());
+            return null;
         }
     }
 }

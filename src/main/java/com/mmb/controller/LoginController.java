@@ -8,11 +8,11 @@ public class LoginController {
 
     @GetMapping("/login")
     public String login() {
-        return "usr/member/login";
+        return "redirect:/usr/member/login";
     }
 
     @GetMapping("/usr/member/login")
-    public String legacyLogin() {
-        return "redirect:/login";
+    public String usrMemberLogin() {
+        return "usr/member/login";
     }
 }

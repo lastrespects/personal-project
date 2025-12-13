@@ -46,12 +46,13 @@ public class UsrArticleController {
 
     private boolean isAdmin() {
         Member member = resolveCurrentMember();
-        return member != null && member.getAuthLevel() != null && member.getAuthLevel() == 0;
+        return member != null && member.getAuthLevel() == 0;
     }
 
     private Member resolveCurrentMember() {
-        if (req.getLoginedMember() != null && req.getLoginedMember().getId() > 0) {
-            return memberService.findById((long) req.getLoginedMember().getId()).orElse(null);
+        Integer loginedMemberId = req.getLoginedMemberId();
+        if (req.getLoginedMember() != null && loginedMemberId != null) {
+            return memberService.findById(loginedMemberId.longValue()).orElse(null);
         }
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && auth.getName() != null && !"anonymousUser".equals(auth.getName())) {
@@ -96,7 +97,7 @@ public class UsrArticleController {
             String searchType) {
 
         Member member = resolveCurrentMember();
-        boolean isAdmin = member != null && member.getAuthLevel() != null && member.getAuthLevel() == 0;
+        boolean isAdmin = member != null && member.getAuthLevel() == 0;
         boolean isLoggedIn = member != null;
 
         int itemsInAPage = 10;

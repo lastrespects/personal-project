@@ -246,13 +246,16 @@ public class MemberService {
         }
         Member member = memberOpt.get();
         LocalDateTime now = LocalDateTime.now();
+        LocalDateTime restoreUntil = now.plusDays(7);
         member.setDeletedAt(now);
-        member.setRestoreUntil(now.plusDays(7));
+        member.setRestoreUntil(restoreUntil);
         memberRepository.save(member);
 
+        String restoreUntilStr = restoreUntil.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         Map<String, Object> data = new HashMap<>();
-        data.put("restoreUntil", member.getRestoreUntil().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
-        return new ResultData<>("S-1", "계정이 7일 후 삭제될 예정입니다.", data);
+        data.put("restoreUntil", restoreUntilStr);
+        String msg = restoreUntilStr + "까지 같은 계정으로 로그인하면 복구할 수 있습니다.";
+        return new ResultData<>("S-1", msg, data);
     }
 
     @Transactional

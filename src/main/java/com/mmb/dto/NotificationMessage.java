@@ -1,14 +1,15 @@
-// NotificationMessage.java
 package com.mmb.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class NotificationMessage {
-	private int recipient;
-	private String content;
+    private String recipient;
+    private String content;
 }

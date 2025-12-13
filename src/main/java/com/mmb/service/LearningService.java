@@ -10,4 +10,6 @@ public interface LearningService {
 
     List<TodayWordDto> prepareTodayWords(Long memberId);
 
+    void recordResult(Long memberId, Long wordId, boolean correct);
+
 }

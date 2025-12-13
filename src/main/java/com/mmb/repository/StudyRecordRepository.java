@@ -11,48 +11,52 @@ import java.util.List;
 
 public interface StudyRecordRepository extends JpaRepository<StudyRecord, Long> {
 
-  // ✅ 오늘 학습한 단어(중복 제거)
-  @Query("""
-          select distinct sr.word
-          from StudyRecord sr
-          where sr.member.id = :memberId
-            and sr.studiedAt >= :start
-            and sr.studiedAt < :end
-          order by sr.word.id desc
-      """)
-  List<Word> findStudiedWordsBetween(@Param("memberId") Long memberId,
-      @Param("start") LocalDateTime start,
-      @Param("end") LocalDateTime end);
+    // 오늘 특정 시간 구간 동안 공부한 단어 목록 (예: 오늘의 학습 단어)
+    @Query("select distinct w " +
+            "from StudyRecord sr " +
+            "join Word w on w.id = sr.wordId " +
+            "where sr.memberId = :memberId " +
+            "and sr.studiedAt >= :start " +
+            "and sr.studiedAt < :end " +
+            "order by sr.studiedAt desc, sr.id desc")
+    List<Word> findStudiedWordsBetween(@Param("memberId") Long memberId,
+                                       @Param("start") LocalDateTime start,
+                                       @Param("end") LocalDateTime end);
 
-  // ✅ 최근 N일 학습 단어
-  @Query("""
-          select distinct sr.word
-          from StudyRecord sr
-          where sr.member.id = :memberId
-            and sr.studiedAt >= :since
-          order by sr.studiedAt desc
-      """)
-  List<Word> findStudiedWordsSince(@Param("memberId") Long memberId,
-      @Param("since") LocalDateTime since);
+    // 특정 시점 이후에 공부한 단어들
+    @Query("select distinct w " +
+            "from StudyRecord sr " +
+            "join Word w on w.id = sr.wordId " +
+            "where sr.memberId = :memberId " +
+            "and sr.studiedAt >= :since " +
+            "order by sr.studiedAt desc, sr.id desc")
+    List<Word> findStudiedWordsSince(@Param("memberId") Long memberId,
+                                     @Param("since") LocalDateTime since);
 
-  // ✅ 최근 학습 기록 쿼리 (보충용)
-  @Query("""
-          select distinct sr.word
-          from StudyRecord sr
-          where sr.member.id = :memberId
-          order by sr.studiedAt desc
-      """)
-  List<Word> findRecentStudiedWords(@Param("memberId") Long memberId);
+    // 최근에 공부한 단어들 (정렬 후 Word만 추출)
+    @Query("select w " +
+            "from StudyRecord sr " +
+            "join Word w on w.id = sr.wordId " +
+            "where sr.memberId = :memberId " +
+            "order by sr.studiedAt desc")
+    List<Word> findRecentStudiedWords(@Param("memberId") Long memberId);
 
-  // ✅ 오늘 학습한 단어 수 카운트
-  @Query("""
-          select count(distinct sr.word.id)
-          from StudyRecord sr
-          where sr.member.id = :memberId
-            and sr.studiedAt >= :start
-            and sr.studiedAt < :end
-      """)
-  long countTodayLearnedWords(@Param("memberId") Long memberId,
-      @Param("start") LocalDateTime start,
-      @Param("end") LocalDateTime end);
+    // 오늘 퀴즈/책 학습 횟수 (studyType + 시간 구간)
+    long countByMemberIdAndStudyTypeAndStudiedAtBetween(Long memberId,
+                                                        String studyType,
+                                                        LocalDateTime start,
+                                                        LocalDateTime end);
+
+    // 메인 대시보드: 오늘 "학습한 단어 수" (단어 기준 distinct 개수)
+    @Query("select count(distinct sr.wordId) " +
+            "from StudyRecord sr " +
+            "where sr.memberId = :memberId " +
+            "and sr.studiedAt >= :start " +
+            "and sr.studiedAt < :end")
+    long countTodayLearnedWords(@Param("memberId") Long memberId,
+                                @Param("start") LocalDateTime start,
+                                @Param("end") LocalDateTime end);
+
+    // 최근 학습 로그 100개
+    List<StudyRecord> findTop100ByMemberIdOrderByStudiedAtDesc(Long memberId);
 }

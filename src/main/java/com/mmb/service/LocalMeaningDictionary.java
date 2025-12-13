@@ -50,7 +50,7 @@ public final class LocalMeaningDictionary {
             Map.entry("father", "\uC544\uBC84\uC9C0"),
             Map.entry("sister", "\uC790\uB9E4"),
             Map.entry("brother", "\uD615\uC81C"),
-            Map.entry("grandmother", "\uD560\uBA38\uB9AC"),
+            Map.entry("grandmother", "\uD560\uBA38\uB2C8"),
             Map.entry("grandfather", "\uD560\uC544\uBC84\uC9C0"),
             Map.entry("uncle", "\uC0BC\uCD0C"),
             Map.entry("aunt", "\uC774\uBAA8"),

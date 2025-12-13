@@ -25,38 +25,38 @@ public class Member {
     @Column(nullable = false)
     private LocalDateTime updateDate;
 
-    // login
-    @Column(length = 50, nullable = false, unique = true)
+    // 로그인 아이디
+    @Column(unique = true, nullable = false)
     private String username;
 
-    @Column(length = 100)
-    private String email;
-
-    @Column(name = "PASSWORD", length = 255, nullable = false)
+    // 암호화된 비밀번호
+    @Column(nullable = false, length = 255)
     private String password;
+
+    // 권한 레벨 (1: 일반, 7: 관리자 등)
+    @Builder.Default
+    private int authLevel = 3; // 0=ADMIN, 3=USER
+
+    // 이메일
+    private String email;
 
     // profile
     @Column(length = 20, nullable = false)
     private String realName;
 
-    @Column(length = 50, nullable = false, unique = true)
+    // 닉네임 + 닉네임 마지막 변경 시각
+    @Column(length = 50, nullable = false)
     private String nickname;
+
+    private LocalDateTime nicknameUpdatedAt;
 
     private Integer age;
 
-    @Column(length = 20)
+    // 지역 / 일일 학습 목표
     private String region;
 
-    @Column(nullable = false)
     @Builder.Default
     private Integer dailyTarget = 30;
-
-    @Column(nullable = false)
-    @Builder.Default
-    private Integer authLevel = 3; // 0=ADMIN, 3=USER
-
-    // track nickname changes (for 30-day lock)
-    private LocalDateTime nicknameUpdatedAt;
 
     // soft delete (keep for 7 days)
     private LocalDateTime deletedAt;
@@ -83,9 +83,6 @@ public class Member {
 
         if (this.dailyTarget == null) {
             this.dailyTarget = 30;
-        }
-        if (this.authLevel == null) {
-            this.authLevel = 3;
         }
         if (this.characterLevel == null) {
             this.characterLevel = 1;
@@ -115,7 +112,7 @@ public class Member {
     }
 
     public boolean isAdmin() {
-        return this.authLevel != null && this.authLevel == 0;
+        return this.authLevel == 0;
     }
 
     public boolean isDeleted() {

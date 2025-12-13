@@ -13,6 +13,14 @@
             alert(decodeURIComponent(msg));
         }
     };
+
+    function pickRestoreUntil(res) {
+        const root = res || {};
+        const rsData = root.rsData || root.data || (root.resultData && root.resultData.rsData) || {};
+        const v = rsData.restoreUntil ?? rsData.restoreUntilStr ?? rsData.restoreDate ?? rsData.restore_until ?? "";
+        const s = String(v ?? "").trim();
+        return s.length > 0 ? s : "";
+    }
     function loginFormSubmit(form) {
         const usernameInput = form.username;
         const passwordInput = form.password;
@@ -44,8 +52,16 @@
                         return;
                     }
                     if (data.rsCode === 'D-1') {
-                        const restoreUntil = data.data && data.data.restoreUntil ? data.data.restoreUntil : '';
-                        const confirmRestore = confirm(`탈퇴한 계정입니다.\n${restoreUntil ? restoreUntil + ' 이후 ' : ''}복구하시겠습니까?`);
+                        const restoreData = data.rsData || data.data || {};
+                        const restoreUntil = pickRestoreUntil(data);
+                        const baseMsg = String(data.rsMsg || data.msg || '').trim();
+                        const fallbackMsg = '7일 이내에 같은 계정으로 로그인하면 복구할 수 있습니다.';
+                        const restoreNotice = restoreUntil.length > 0
+                                ? `${restoreUntil}까지 같은 계정으로 로그인하면 복구할 수 있습니다.`
+                                : (baseMsg.length > 0 ? baseMsg : fallbackMsg);
+                        const nickname = restoreData.nickname ? restoreData.nickname : '';
+                        const welcomeName = nickname ? `${nickname}님, ` : '';
+                        const confirmRestore = confirm(`${welcomeName}탈퇴 상태의 계정입니다.\n${restoreNotice}\n바로 복구를 진행하시겠습니까?`);
                         if (!confirmRestore) {
                             return;
                         }

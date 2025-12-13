@@ -1,62 +1,38 @@
 package com.mmb.dto;
 
-import java.io.IOException;
-
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
 
-import com.mmb.util.Util;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import com.mmb.entity.Member;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Component
-@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class Req {
+    private Member loginedMember;
 
-	@Getter
-	private LoginedMember loginedMember;
+    public Integer getLoginedMemberId() {
+        if (loginedMember == null || loginedMember.getId() == null) {
+            return null;
+        }
+        return loginedMember.getId().intValue();
+    }
 
-	private HttpServletResponse resp;
-	private HttpSession session;
+    public void init() {
+        // placeholder for per-request initialization logic
+    }
 
-	public Req(HttpServletRequest request, HttpServletResponse response) {
-
-		this.resp = response;
-		this.session = request.getSession();
-
-		this.loginedMember = (LoginedMember) this.session.getAttribute("loginedMember");
-
-		// LoginedMember가 null일 경우, 비로그인 상태를 나타내는 객체로 초기화
-		if (this.loginedMember == null) {
-			this.loginedMember = new LoginedMember();
-		}
-
-		request.setAttribute("req", this);
-	}
-
-	public void jsPrintReplace(String msg, String uri) {
-
-		this.resp.setContentType("text/html; charset=UTF-8;");
-
-		try {
-			this.resp.getWriter().append(Util.jsReplace(msg, uri));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void login(LoginedMember loginedMember) {
-		this.session.setAttribute("loginedMember", loginedMember);
-	}
-
-	public void logout() {
-		this.session.invalidate();
-	}
-
-	public void init() {
-	}
+    public String jsPrintReplace(String msg, String uri) {
+        // helper for returning a redirect response script
+        return "redirect:" + uri;
+    }
 }

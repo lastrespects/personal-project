@@ -13,11 +13,11 @@ public class StudyRecordController {
     private final FullLearningService fullLearningService;
 
     @PostMapping("/usr/study/record")
-    public String record(@RequestParam Long wordId,
+    public String record(@RequestParam Integer wordId,
             @RequestParam(defaultValue = "true") boolean correct,
             @RequestParam(defaultValue = "BOOK") String studyType) {
 
-        Long memberId = getLoginMemberId(); // TODO: 로그인 연동 필요
+        Integer memberId = getLoginMemberId(); // TODO: 로그인 연동 필요
 
         String normalizedType = studyType == null ? "BOOK" : studyType.trim().toUpperCase();
         if ("QUIZ".equals(normalizedType)) {
@@ -31,8 +31,8 @@ public class StudyRecordController {
         return "OK";
     }
 
-    private Long getLoginMemberId() {
-        // TODO: 구현 교체
-        return 1L;
+    private Integer getLoginMemberId() {
+        // TODO: 실제 세션 값을 사용하도록 개선 필요. 현재는 1 고정
+        return 1;
     }
 }

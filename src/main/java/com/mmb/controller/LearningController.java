@@ -22,7 +22,7 @@ public class LearningController {
      * 예: GET /api/learning/today?memberId=1
      */
     @GetMapping("/today")
-    public List<TodayWordDto> getTodayWords(@RequestParam Long memberId) {
+    public List<TodayWordDto> getTodayWords(@RequestParam Integer memberId) {
         return learningService.prepareTodayWords(memberId);
     }
 
@@ -33,7 +33,7 @@ public class LearningController {
      */
     @PostMapping("/result")
     public void submitResult(
-            @RequestParam Long memberId,
+            @RequestParam Integer memberId,
             @RequestBody LearningResultRequest request
     ) {
         learningService.recordResult(memberId, request.getWordId(), request.isCorrect());

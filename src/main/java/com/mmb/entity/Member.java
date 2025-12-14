@@ -9,60 +9,53 @@ import java.time.LocalDateTime;
 @Table(name = "member")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id; // ✅ INT PK
 
-    // created/updated timestamps
     @Column(nullable = false, updatable = false)
     private LocalDateTime regDate;
 
     @Column(nullable = false)
     private LocalDateTime updateDate;
 
-    // 로그인 아이디
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false, unique = true, length = 50)
     private String username;
 
-    // 암호화된 비밀번호
-    @Column(nullable = false, length = 255)
-    private String password;
-
-    // 권한 레벨 (1: 일반, 7: 관리자 등)
-    @Builder.Default
-    private int authLevel = 3; // 0=ADMIN, 3=USER
-
-    // 이메일
+    @Column(nullable = false, length = 100)
     private String email;
 
-    // profile
-    @Column(length = 20, nullable = false)
+    // DB 컬럼명이 PASSWORD(대문자)라서 명시적으로 매핑
+    @Column(name = "PASSWORD", nullable = false, length = 255)
+    private String password;
+
+    @Column(nullable = false, length = 20)
     private String realName;
 
-    // 닉네임 + 닉네임 마지막 변경 시각
-    @Column(length = 50, nullable = false)
+    @Column(nullable = false, unique = true, length = 50)
     private String nickname;
-
-    private LocalDateTime nicknameUpdatedAt;
 
     private Integer age;
 
-    // 지역 / 일일 학습 목표
+    @Column(length = 20)
     private String region;
 
-    @Builder.Default
-    private Integer dailyTarget = 30;
+    // DB에 NOT NULL이 없어서 nullable 강제하지 않음(validate 일치)
+    private Integer dailyTarget;
 
-    // soft delete (keep for 7 days)
+    @Column(nullable = false)
+    private Integer authLevel;
+
+    private LocalDateTime nicknameUpdatedAt;
     private LocalDateTime deletedAt;
     private LocalDateTime restoreUntil;
 
-    // ====== game-like transient fields ======
+    // ---- DB 컬럼에는 없으니 validate 통과용으로 Transient 유지 가능 ----
     @Transient
     @Builder.Default
     private Integer characterLevel = 1;
@@ -74,22 +67,14 @@ public class Member {
     @Transient
     private String lastHintDate;
 
-    // lifecycle
     @PrePersist
     protected void onCreate() {
         LocalDateTime now = LocalDateTime.now();
         this.regDate = now;
         this.updateDate = now;
 
-        if (this.dailyTarget == null) {
-            this.dailyTarget = 30;
-        }
-        if (this.characterLevel == null) {
-            this.characterLevel = 1;
-        }
-        if (this.currentExp == null) {
-            this.currentExp = 0;
-        }
+        if (this.authLevel == null) this.authLevel = 3;
+        if (this.dailyTarget == null) this.dailyTarget = 30;
     }
 
     @PreUpdate
@@ -97,25 +82,7 @@ public class Member {
         this.updateDate = LocalDateTime.now();
     }
 
-    // exp gain helper
-    public void gainExp(int exp) {
-        if (exp <= 0) return;
-
-        if (this.currentExp == null) this.currentExp = 0;
-        if (this.characterLevel == null) this.characterLevel = 1;
-
-        this.currentExp += exp;
-        while (this.currentExp >= 100) {
-            this.characterLevel++;
-            this.currentExp -= 100;
-        }
-    }
-
     public boolean isAdmin() {
-        return this.authLevel == 0;
-    }
-
-    public boolean isDeleted() {
-        return this.deletedAt != null;
+        return this.authLevel != null && this.authLevel == 0;
     }
 }

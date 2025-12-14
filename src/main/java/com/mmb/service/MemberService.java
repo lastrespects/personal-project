@@ -70,12 +70,12 @@ public class MemberService {
         return memberRepository.findByUsername(username);
     }
 
-    public Optional<Member> findById(Long id) {
+    public Optional<Member> findById(Integer id) {
         return memberRepository.findById(id);
     }
 
     public Member getMemberById(int id) {
-        return memberRepository.findById((long) id).orElse(null);
+        return memberRepository.findById(id).orElse(null);
     }
 
     public ResultData<Map<String, Object>> validateLoginInfo(String username, String rawPassword) {
@@ -85,7 +85,7 @@ public class MemberService {
         }
 
         Member member = memberOpt.get();
-        if (member.isDeleted()) {
+        if (member.getDeletedAt() != null) {
             LocalDateTime now = LocalDateTime.now();
             if (member.getRestoreUntil() != null && member.getRestoreUntil().isAfter(now)) {
                 String restoreUntilStr = member.getRestoreUntil().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));

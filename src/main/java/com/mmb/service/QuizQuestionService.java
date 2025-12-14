@@ -353,7 +353,7 @@ public class QuizQuestionService {
     }
 
     private record WordContext(
-            Long wordId,
+            Integer wordId,
             String spelling,
             String meaning,
             String example,

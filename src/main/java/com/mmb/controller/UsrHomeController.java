@@ -3,6 +3,7 @@ package com.mmb.controller;
 import com.mmb.service.ArticleService;
 import com.mmb.service.FullLearningService;
 import com.mmb.service.MemberService;
+import com.mmb.util.SessionMemberUtil;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -23,13 +24,13 @@ public class UsrHomeController {
 
     @GetMapping("/main")
     public String showMain(HttpSession session, Model model, Principal principal) {
-        Long loginedMemberId = (Long) session.getAttribute("loginedMemberId");
+        Integer loginedMemberId = SessionMemberUtil.getSessionMemberId(session);
 
         if (loginedMemberId == null && principal != null) {
             memberService.findByUsername(principal.getName()).ifPresent(member -> {
                 session.setAttribute("loginedMemberId", member.getId());
             });
-            loginedMemberId = (Long) session.getAttribute("loginedMemberId");
+            loginedMemberId = SessionMemberUtil.getSessionMemberId(session);
         }
 
         if (loginedMemberId != null) {

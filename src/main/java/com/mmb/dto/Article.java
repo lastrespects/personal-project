@@ -17,7 +17,7 @@ public class Article {
 	private String content;
 	private String writerName;
 	private int boardId;
-	private int likePoint;
+	private int likeCount;
 	private int views;
 	
 	public String getForPrintContent() {

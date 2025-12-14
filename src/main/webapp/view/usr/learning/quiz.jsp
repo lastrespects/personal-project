@@ -723,33 +723,54 @@
         }
 
         // ---- 정답 전송 ----
-        function sendQuizResult(wordId, correct) {
-            if (!wordId || wordId < 0) return;
+        async function sendQuizResult(wordId, correct) {
+            if (!wordId || wordId < 0) {
+                return;
+            }
             const form = new URLSearchParams();
             form.append('wordId', wordId);
             form.append('correct', correct);
 
-            fetch('/learning/quiz/result', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                credentials: 'same-origin',
-                body: form.toString()
-            })
-                .then(r => r.json().catch(() => null))
-                .then(data => {
-                    if (!data || !data.success) {
-                        const msg = data && data.msg === 'NOT_LOGGED_IN'
-                            ? '세션이 만료되었습니다. 다시 로그인해 주세요.'
-                            : '결과 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.';
-                        alert(msg);
-                        return;
-                    }
-                    updateQuizStats(data.quizSolvedCount, data.quizRemainingCount);
-                })
-                .catch(e => {
-                    console.error(e);
-                    alert('결과 저장 중 오류가 발생했습니다.');
+            try {
+                const res = await fetch('/learning/quiz/result', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin',
+                    body: form.toString()
                 });
+                let data = null;
+                try {
+                    data = await res.json();
+                } catch (e) {
+                    // ignore parse failure
+                }
+                if (!res.ok) {
+                    alert((data && (data.msg || data.rsMsg)) || '결과 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+                    return;
+                }
+                if (!data) {
+                    alert('결과 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+                    return;
+                }
+                const code = data.resultCode || data.rsCode || '';
+                if (code === 'F-401' || code === 'F-403') {
+                    alert((data.msg || data.rsMsg) || '로그인이 필요합니다.');
+                    return;
+                }
+                if (!code.startsWith('S-')) {
+                    alert((data.msg || data.rsMsg) || '결과 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+                    return;
+                }
+                const payload = (data.rsData !== undefined ? data.rsData : data.data) || {};
+                updateQuizStats(payload.quizSolvedCount, payload.quizRemainingCount);
+            } catch (error) {
+                console.error(error);
+                alert(error.message || '결과 저장 중 오류가 발생했습니다.');
+            }
         }
 
         // ---- 렌더링 ----

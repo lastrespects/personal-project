@@ -24,7 +24,7 @@
 </head>
 <body>
     <h1>${boardName} 게시판</h1>
-    <div class="meta">총 ${articlesCnt}개</div>
+    <div class="meta">총 ${articlesCnt}건</div>
 
     <form class="search" method="get" action="/usr/article/list">
         <input type="hidden" name="boardId" value="${param.boardId}" />
@@ -43,7 +43,7 @@
             <th>제목</th>
             <th>작성자</th>
             <th>작성일</th>
-            <th>추천</th>
+            <th>좋아요</th>
             <th>조회</th>
         </tr>
         <c:forEach items="${articles}" var="article">
@@ -52,7 +52,7 @@
                 <td><a href="/usr/article/detail?id=${article.id}">${article.title}</a></td>
                 <td>${article.writerName}</td>
                 <td>${article.regDate}</td>
-                <td>${article.likePoint}</td>
+                <td>${article.likeCount}</td>
                 <td>${article.views}</td>
             </tr>
         </c:forEach>

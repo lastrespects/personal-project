@@ -3,6 +3,8 @@ package com.mmb.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mmb.dto.QuizQuestionDto;
+import com.mmb.dto.Req;
+import com.mmb.dto.ResultData;
 import com.mmb.dto.TodayWordDto;
 import com.mmb.entity.Member;
 import com.mmb.entity.Word;
@@ -10,8 +12,8 @@ import com.mmb.service.FullLearningService;
 import com.mmb.service.LearningService;
 import com.mmb.service.MemberService;
 import com.mmb.service.QuizQuestionService;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +32,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/learning")
 @RequiredArgsConstructor
+@Slf4j
 public class UsrLearningController {
 
     private final LearningService learningService;
@@ -37,18 +40,35 @@ public class UsrLearningController {
     private final MemberService memberService;
     private final QuizQuestionService quizQuestionService;
     private final ObjectMapper objectMapper;
+    private final Req req;
 
     @GetMapping("/wordbook")
-    public String showWordbook(Model model, Principal principal) {
-        if (principal == null) {
-            return "redirect:/login?msg=PleaseLogin";
+    public String showWordbook(Model model) {
+        Integer memberId = req.getLoginedMemberId();
+        if (memberId == null) {
+            return "redirect:/usr/member/login?error=1";
         }
 
-        Member member = memberService.findByUsername(principal.getName())
-                .orElseThrow(() -> new IllegalArgumentException("Member not found."));
+        Member member = req.getLoginedMember();
+        if (member == null) {
+            member = memberService.findById(memberId)
+                    .orElseThrow(() -> new IllegalArgumentException("Member not found."));
+        }
 
-        List<TodayWordDto> todayWords = learningService.prepareTodayWords(member.getId());
-        model.addAttribute("todayWords", todayWords);
+        int dailyTarget = member.getDailyTarget() != null ? member.getDailyTarget()
+                : fullLearningService.getDailyTarget(memberId);
+
+        try {
+            List<TodayWordDto> todayWords = learningService.prepareTodayWords(member.getId());
+            log.info("[WORDBOOK] memberId={} dailyTarget={} words={}", memberId, dailyTarget, todayWords.size());
+            model.addAttribute("todayWords", todayWords);
+            model.addAttribute("wordbookError", null);
+        } catch (Exception e) {
+            log.error("[WORDBOOK_FAIL] memberId={} dailyTarget={}", memberId, dailyTarget, e);
+            model.addAttribute("todayWords", List.of());
+            model.addAttribute("wordbookError", "단어장을 불러오는 중 오류가 발생했습니다: " + e.getMessage());
+        }
+        model.addAttribute("dailyTarget", dailyTarget);
         return "usr/learning/wordbook";
     }
 
@@ -87,55 +107,36 @@ public class UsrLearningController {
 
     @PostMapping("/quiz/result")
     @ResponseBody
-    public Map<String, Object> recordQuizResult(@RequestParam Long wordId,
-                                                @RequestParam boolean correct,
-                                                HttpSession session,
-                                                Principal principal) {
+    public ResultData<Map<String, Object>> recordQuizResult(@RequestParam Integer wordId,
+                                                            @RequestParam boolean correct) {
 
-        Map<String, Object> response = new HashMap<>();
-
-        Long memberId = resolveMemberId(session, principal);
+        Integer memberId = req.getLoginedMemberId();
         if (memberId == null) {
-            response.put("success", false);
-            response.put("msg", "NOT_LOGGED_IN");
-            return response;
+            return ResultData.from("F-401", "로그인이 필요합니다.");
         }
+        if (wordId == null || wordId <= 0) {
+            return ResultData.from("F-400", "wordId가 없습니다.");
+        }
+
+        log.info("[QUIZ_SAVE] memberId={}, wordId={}, correct={}", memberId, wordId, correct);
 
         try {
             fullLearningService.applyQuizResult(memberId, wordId, correct);
         } catch (Exception e) {
-            response.put("success", false);
-            response.put("msg", "SAVE_FAILED");
-            return response;
+            log.error("[WRITE_FAIL] endpoint=/learning/quiz/result memberId={}, wordId={}", memberId, wordId, e);
+            String message = e.getMessage() != null ? e.getMessage() : "퀴즈 저장에 실패했습니다.";
+            return ResultData.from("F-500", message);
         }
 
         long quizSolvedCount = fullLearningService.getTodayQuizSolvedCount(memberId);
         int todayTarget = fullLearningService.getDailyTarget(memberId);
         long quizRemainingCount = Math.max(todayTarget - quizSolvedCount, 0);
 
-        response.put("success", true);
-        response.put("quizSolvedCount", quizSolvedCount);
-        response.put("quizRemainingCount", quizRemainingCount);
+        Map<String, Object> data = new HashMap<>();
+        data.put("quizSolvedCount", quizSolvedCount);
+        data.put("quizRemainingCount", quizRemainingCount);
 
-        return response;
-    }
-
-    private Long resolveMemberId(HttpSession session, Principal principal) {
-        if (principal != null) {
-            return memberService.findByUsername(principal.getName())
-                    .map(member -> {
-                        session.setAttribute("loginedMemberId", member.getId());
-                        return member.getId();
-                    })
-                    .orElse(null);
-        }
-
-        Object attribute = session.getAttribute("loginedMemberId");
-        if (attribute instanceof Long id) {
-            return id;
-        }
-
-        return null;
+        return ResultData.from("S-1", "QUIZ_RESULT_SAVED", data);
     }
 
     // ✅ quiz.jsp에서 fallback wordsJson으로 쓰는 데이터

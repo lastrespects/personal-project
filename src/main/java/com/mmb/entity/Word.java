@@ -2,11 +2,9 @@ package com.mmb.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 
-/**
- * Word entity: stores the core vocabulary data for the learning app.
- */
 @Entity
 @Table(name = "word")
 @Getter
@@ -18,19 +16,35 @@ public class Word {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // primary key
+    private Integer id; // ✅ INT PK
 
-    private LocalDateTime regDate;     // created at
-    private LocalDateTime updateDate;  // last updated at
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime regDate;
+
+    @Column(nullable = false)
+    private LocalDateTime updateDate;
 
     @Column(nullable = false, length = 100)
-    private String spelling;           // word spelling (English)
+    private String spelling;
 
     @Column(nullable = false, length = 255)
-    private String meaning;            // meaning (Korean or explanation)
+    private String meaning;
 
     @Column(columnDefinition = "TEXT")
-    private String exampleSentence;    // example sentence
+    private String exampleSentence;
 
-    private String audioPath;          // TTS audio file path
+    @Column(length = 255)
+    private String audioPath;
+
+    @PrePersist
+    protected void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+        this.regDate = now;
+        this.updateDate = now;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updateDate = LocalDateTime.now();
+    }
 }

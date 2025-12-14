@@ -23,6 +23,7 @@ public class BeforeActionInterceptor implements HandlerInterceptor {
 			throws Exception {
 
 		this.req.init();
+		request.setAttribute("req", this.req);
 
 		return HandlerInterceptor.super.preHandle(request, response, handler);
 	}

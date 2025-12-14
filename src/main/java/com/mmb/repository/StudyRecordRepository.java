@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface StudyRecordRepository extends JpaRepository<StudyRecord, Long> {
+public interface StudyRecordRepository extends JpaRepository<StudyRecord, Integer> {
 
     // 오늘 특정 시간 구간 동안 공부한 단어 목록 (예: 오늘의 학습 단어)
     @Query("select distinct w " +
@@ -19,7 +19,7 @@ public interface StudyRecordRepository extends JpaRepository<StudyRecord, Long> 
             "and sr.studiedAt >= :start " +
             "and sr.studiedAt < :end " +
             "order by sr.studiedAt desc, sr.id desc")
-    List<Word> findStudiedWordsBetween(@Param("memberId") Long memberId,
+    List<Word> findStudiedWordsBetween(@Param("memberId") Integer memberId,
                                        @Param("start") LocalDateTime start,
                                        @Param("end") LocalDateTime end);
 
@@ -30,7 +30,7 @@ public interface StudyRecordRepository extends JpaRepository<StudyRecord, Long> 
             "where sr.memberId = :memberId " +
             "and sr.studiedAt >= :since " +
             "order by sr.studiedAt desc, sr.id desc")
-    List<Word> findStudiedWordsSince(@Param("memberId") Long memberId,
+    List<Word> findStudiedWordsSince(@Param("memberId") Integer memberId,
                                      @Param("since") LocalDateTime since);
 
     // 최근에 공부한 단어들 (정렬 후 Word만 추출)
@@ -39,10 +39,10 @@ public interface StudyRecordRepository extends JpaRepository<StudyRecord, Long> 
             "join Word w on w.id = sr.wordId " +
             "where sr.memberId = :memberId " +
             "order by sr.studiedAt desc")
-    List<Word> findRecentStudiedWords(@Param("memberId") Long memberId);
+    List<Word> findRecentStudiedWords(@Param("memberId") Integer memberId);
 
     // 오늘 퀴즈/책 학습 횟수 (studyType + 시간 구간)
-    long countByMemberIdAndStudyTypeAndStudiedAtBetween(Long memberId,
+    long countByMemberIdAndStudyTypeAndStudiedAtBetween(Integer memberId,
                                                         String studyType,
                                                         LocalDateTime start,
                                                         LocalDateTime end);
@@ -53,10 +53,10 @@ public interface StudyRecordRepository extends JpaRepository<StudyRecord, Long> 
             "where sr.memberId = :memberId " +
             "and sr.studiedAt >= :start " +
             "and sr.studiedAt < :end")
-    long countTodayLearnedWords(@Param("memberId") Long memberId,
+    long countTodayLearnedWords(@Param("memberId") Integer memberId,
                                 @Param("start") LocalDateTime start,
                                 @Param("end") LocalDateTime end);
 
     // 최근 학습 로그 100개
-    List<StudyRecord> findTop100ByMemberIdOrderByStudiedAtDesc(Long memberId);
+    List<StudyRecord> findTop100ByMemberIdOrderByStudiedAtDesc(Integer memberId);
 }

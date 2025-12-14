@@ -35,11 +35,12 @@ public class DeepLTranslationClient implements TranslationClient {
     @Override
     public String translateToKorean(String englishText) {
         if (englishText == null || englishText.isBlank()) {
-            return englishText == null ? "" : englishText;
+            return "";
         }
 
         if (apiUrl == null || apiUrl.isBlank() || apiKey == null || apiKey.isBlank()) {
-            return englishText;
+            log.warn("[DEEPL DISABLED] Missing API URL or KEY");
+            return "";
         }
 
         try {
@@ -57,7 +58,8 @@ public class DeepLTranslationClient implements TranslationClient {
             HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
             String response = restTemplate.postForObject(apiUrl, request, String.class);
             if (response == null || response.isBlank()) {
-                return englishText;
+                log.warn("[DEEPL EMPTY RESPONSE]");
+                return "";
             }
 
             JsonNode translations = objectMapper.readTree(response).path("translations");
@@ -68,9 +70,10 @@ public class DeepLTranslationClient implements TranslationClient {
                 }
             }
         } catch (Exception e) {
-            log.warn("[DEEPL ERROR] {}", e.getMessage());
+            log.warn("[DEEPL ERROR] text={}", englishText, e);
+            return "";
         }
 
-        return englishText;
+        return "";
     }
 }

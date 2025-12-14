@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class TodayWordDto {
 
     // 단어 ID (지금은 화면에서 안 쓰더라도 있어도 무방)
-    private Long wordId;
+    private Integer wordId;
 
     // 영어 단어
     private String spelling;

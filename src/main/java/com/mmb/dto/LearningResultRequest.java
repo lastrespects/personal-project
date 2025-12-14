@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LearningResultRequest {
 
-    private Long wordId;
+    private Integer wordId;
     private boolean correct;
 }

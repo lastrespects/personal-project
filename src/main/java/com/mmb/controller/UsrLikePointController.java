@@ -1,60 +1,72 @@
-// UsrLikePointController.java
 package com.mmb.controller;
 
+import java.util.Map;
+
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.mmb.dto.LikePoint;
 import com.mmb.dto.Req;
 import com.mmb.dto.ResultData;
 import com.mmb.service.LikePointService;
+import com.mmb.service.LikePointWriteService;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Controller
+@Slf4j
 public class UsrLikePointController {
 
-    private LikePointService likePointService;
-    private Req req;
+    private final LikePointService likePointService;
+    private final LikePointWriteService likePointWriteService;
+    private final Req req;
 
-    public UsrLikePointController(LikePointService likePointService, Req req) {
+    public UsrLikePointController(LikePointService likePointService, LikePointWriteService likePointWriteService, Req req) {
         this.likePointService = likePointService;
+        this.likePointWriteService = likePointWriteService;
         this.req = req;
     }
 
-    @GetMapping("/usr/likePoint/getLikePoint")
+    @PostMapping("/usr/likePoint/toggle")
     @ResponseBody
-    public ResultData<Integer> getLikePoint(String relTypeCode, int relId) {
-
-        LikePoint likePoint = this.likePointService.getLikePoint(
-                Math.toIntExact(this.req.getLoginedMember().getId()),
-                relTypeCode,
-                relId);
-        int likePointCnt = this.likePointService.getLikePointCnt(relTypeCode, relId);
-
-        if (likePoint == null) {
-            return new ResultData<>("F-1", "LIKE_NOT_FOUND", likePointCnt);
+    public ResultData<Map<String, Object>> toggle(@RequestParam String relTypeCode,
+                                                  @RequestParam(required = false) Integer relId) {
+        Integer memberId = req.getLoginedMemberId();
+        if (memberId == null) {
+            return ResultData.from("F-401", "로그인이 필요합니다.");
         }
 
-        return new ResultData<>("S-1", "LIKE_FOUND", likePointCnt);
-    }
-
-    @GetMapping("/usr/likePoint/clickLikePoint")
-    @ResponseBody
-    public String clickLikePoint(String relTypeCode, int relId, boolean likePointBtn) {
-
-        if (!likePointBtn) {
-            this.likePointService.deleteLikePoint(
-                    Math.toIntExact(this.req.getLoginedMember().getId()),
-                    relTypeCode,
-                    relId);
-            return "LIKE_CANCEL";
+        if (!StringUtils.hasText(relTypeCode)) {
+            return ResultData.from("F-400", "relTypeCode가 없습니다.");
+        }
+        if (relId == null || relId <= 0) {
+            return ResultData.from("F-400", "relId가 없습니다.");
         }
 
-        this.likePointService.insertLikePoint(
-                Math.toIntExact(this.req.getLoginedMember().getId()),
-                relTypeCode,
-                relId);
+        String normalizedRelType = relTypeCode.trim();
+        try {
+            LikePoint likePoint = likePointService.getLikePoint(memberId, normalizedRelType, relId);
+            boolean liked;
+            if (likePoint != null) {
+                likePointWriteService.deleteLikePoint(memberId, normalizedRelType, relId);
+                liked = false;
+            } else {
+                likePointWriteService.insertLikePoint(memberId, normalizedRelType, relId);
+                liked = true;
+            }
 
-        return "LIKE_ADD";
+            int likeCount = likePointService.getLikePointCnt(normalizedRelType, relId);
+            return ResultData.from("S-1", "OK", Map.of(
+                    "liked", liked,
+                    "likeCount", likeCount
+            ));
+        } catch (Exception e) {
+            log.error("[WRITE_FAIL] endpoint=/usr/likePoint/toggle memberId={}, relTypeCode={}, relId={}",
+                    memberId, normalizedRelType, relId, e);
+            return ResultData.from("F-500", "좋아요 처리 중 오류가 발생했습니다.");
+        }
     }
 }

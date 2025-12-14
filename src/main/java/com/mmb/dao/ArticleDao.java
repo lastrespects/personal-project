@@ -69,7 +69,7 @@ public interface ArticleDao {
                 a.regDate,
                 a.title,
                 m.username AS writerName,
-                IFNULL(COUNT(l.memberId), 0) AS likePoint,
+                IFNULL(COUNT(l.memberId), 0) AS likeCount,
                 a.views
             FROM article a
             JOIN member m
@@ -135,7 +135,7 @@ public interface ArticleDao {
                 a.boardId,
                 a.views,
                 m.username AS writerName,
-                IFNULL(COUNT(l.memberId), 0) AS likePoint
+                IFNULL(COUNT(l.memberId), 0) AS likeCount
             FROM article a
             JOIN member m
               ON a.memberId = m.id

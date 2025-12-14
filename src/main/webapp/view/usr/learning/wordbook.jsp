@@ -20,7 +20,15 @@
 </head>
 <body>
     <h1 class="page-title">오늘의 학습 단어</h1>
-    <p class="sub-info">오늘 학습할 단어는 총 <strong>${todayWords.size()}</strong>개입니다.</p>
+    <p class="sub-info">
+        오늘 목표 <strong>${dailyTarget}</strong>개 중 준비된 단어는 총 <strong>${todayWords.size()}</strong>개입니다.
+    </p>
+
+    <c:if test="${not empty wordbookError}">
+        <div style="padding: 12px; border: 1px solid #f97316; background: #fff7ed; color: #9a3412; border-radius: 6px; margin-bottom: 12px;">
+            ${wordbookError}
+        </div>
+    </c:if>
 
     <c:if test="${empty todayWords}">
         <p>오늘 학습할 단어가 없습니다. (목표를 설정해주세요!)</p>

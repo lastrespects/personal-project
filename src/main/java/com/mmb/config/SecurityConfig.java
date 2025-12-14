@@ -1,7 +1,11 @@
 package com.mmb.config;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -13,6 +17,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 
 import com.mmb.repository.MemberRepository;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 public class SecurityConfig {
@@ -74,6 +81,23 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
         );
 
+        http.exceptionHandling(ex -> ex
+                .authenticationEntryPoint((request, response, authException) -> {
+                    if (isAjaxOrJson(request)) {
+                        writeJsonError(response, HttpServletResponse.SC_UNAUTHORIZED, "F-401", "로그인이 필요합니다.");
+                        return;
+                    }
+                    response.sendRedirect("/usr/member/login?error=1");
+                })
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    if (isAjaxOrJson(request)) {
+                        writeJsonError(response, HttpServletResponse.SC_FORBIDDEN, "F-403", "권한이 없습니다.");
+                        return;
+                    }
+                    response.sendRedirect("/usr/member/login?error=1");
+                })
+        );
+
         http.csrf(csrf -> csrf.disable());
 
         http.headers(headers -> headers
@@ -102,5 +126,26 @@ public class SecurityConfig {
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    private void writeJsonError(HttpServletResponse response, int status, String code, String message) throws IOException {
+        response.setStatus(status);
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8");
+        response.getWriter().write("{\"resultCode\":\"" + code + "\",\"msg\":\"" + message + "\"}");
+        response.getWriter().flush();
+    }
+
+    private boolean isAjaxOrJson(HttpServletRequest request) {
+        if (request == null) {
+            return false;
+        }
+        String xrw = request.getHeader("X-Requested-With");
+        String accept = request.getHeader("Accept");
+
+        boolean ajax = "XMLHttpRequest".equalsIgnoreCase(xrw);
+        boolean wantsJson = accept != null && accept.toLowerCase().contains(MediaType.APPLICATION_JSON_VALUE);
+
+        return ajax || wantsJson;
     }
 }

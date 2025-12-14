@@ -13,7 +13,7 @@ import lombok.Setter;
 @Builder
 public class QuizQuestionDto {
 
-    private Long wordId;
+    private Integer wordId;
     private String type;
     private String question;
     private String correctAnswer;

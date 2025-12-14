@@ -7,9 +7,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-public interface WordProgressRepository extends JpaRepository<WordProgress, Long> {
+public interface WordProgressRepository extends JpaRepository<WordProgress, Integer> {
 
-    Optional<WordProgress> findByMemberIdAndWordId(Long memberId, Long wordId);
+    Optional<WordProgress> findByMemberIdAndWordId(Integer memberId, Integer wordId);
 
-    List<WordProgress> findByMemberIdAndNextReviewDateLessThanEqual(Long memberId, LocalDate date);
+    List<WordProgress> findByMemberIdAndNextReviewDateLessThanEqual(Integer memberId, LocalDate date);
 }

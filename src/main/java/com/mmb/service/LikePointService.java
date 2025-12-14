@@ -2,11 +2,13 @@
 package com.mmb.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.mmb.dao.LikePointDao; // 패키지 변경
 import com.mmb.dto.LikePoint; // 패키지 변경
 
 @Service
+@Transactional(readOnly = true)
 public class LikePointService {
 
 	private LikePointDao likePointDao;
@@ -17,14 +19,6 @@ public class LikePointService {
 
 	public int getLikePointCnt(String relTypeCode, int relId) {
 		return this.likePointDao.getLikePointCnt(relTypeCode, relId);
-	}
-
-	public void deleteLikePoint(int memberId, String relTypeCode, int relId) {
-		this.likePointDao.deleteLikePoint(memberId, relTypeCode, relId);
-	}
-
-	public void insertLikePoint(int memberId, String relTypeCode, int relId) {
-		this.likePointDao.insertLikePoint(memberId, relTypeCode, relId);
 	}
 
 	public LikePoint getLikePoint(int memberId, String relTypeCode, int relId) {

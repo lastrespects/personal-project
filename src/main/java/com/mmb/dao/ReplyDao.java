@@ -15,7 +15,7 @@ import com.mmb.dto.Reply;
 public interface ReplyDao {
 
 	@Select("""
-			SELECT r.*, m.loginId AS `writerName`
+			SELECT r.*, COALESCE(NULLIF(m.nickname, ''), m.username) AS `writerName`
 				FROM reply AS r
 				INNER JOIN `member` AS m
 				ON r.memberId = m.id
@@ -39,7 +39,7 @@ public interface ReplyDao {
 	int getLastInsertId();
 
 	@Select("""
-			SELECT r.*, m.loginId AS `writerName`
+			SELECT r.*, COALESCE(NULLIF(m.nickname, ''), m.username) AS `writerName`
 				FROM reply AS r
 				INNER JOIN `member` AS m
 				ON r.memberId = m.id

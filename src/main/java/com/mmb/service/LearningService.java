@@ -8,8 +8,8 @@ import com.mmb.dto.TodayWordDto;
 
 public interface LearningService {
 
-    List<TodayWordDto> prepareTodayWords(Long memberId);
+    List<TodayWordDto> prepareTodayWords(Integer memberId);
 
-    void recordResult(Long memberId, Long wordId, boolean correct);
+    void recordResult(Integer memberId, Integer wordId, boolean correct);
 
 }

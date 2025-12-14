@@ -7,11 +7,18 @@ import com.mmb.entity.Word;
 import com.mmb.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,14 +31,23 @@ public class LearningServiceImpl implements LearningService {
     private final TranslationClient translationClient;
     private final ExampleSentenceService exampleSentenceService;
 
+    @Value("${libre.api.url:https://translate.argosopentech.com/translate}")
+    private String libreApiUrl;
+
+    @Value("${libre.api.key:}")
+    private String libreApiKey;
+
     @Override
     @Transactional(readOnly = true)
-    public List<TodayWordDto> prepareTodayWords(Long memberId) {
-
+    public List<TodayWordDto> prepareTodayWords(Integer memberId) {
+        if (memberId == null) {
+            throw new IllegalArgumentException("memberId is required");
+        }
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found: " + memberId));
 
         List<Word> words = fullLearningService.buildTodayQuizWordsV2(member.getId());
+        log.info("[WORDBOOK_SERVICE] memberId={} fetchedWords={}", memberId, words == null ? 0 : words.size());
         if (words == null || words.isEmpty()) {
             return List.of();
         }
@@ -62,15 +78,12 @@ public class LearningServiceImpl implements LearningService {
             exampleDisplay = "No example available.";
         } else {
             String exampleKo = safeTranslateToKo(exampleEn);
-            boolean hasKo = containsHangul(exampleKo) && !exampleKo.equalsIgnoreCase(exampleEn);
-            if (!hasKo) {
-                log.info("[EXAMPLE TRANSLATION MISSING] wordId={}, spelling={}, example='{}', translated='{}'",
-                        word.getId(), spelling, exampleEn, exampleKo);
-            }
-            if (hasKo) {
+            if (!exampleKo.isBlank() && !exampleKo.equalsIgnoreCase(exampleEn)) {
                 exampleDisplay = exampleEn + " / " + exampleKo;
             } else {
-                exampleDisplay = exampleEn + " / (번역 준비 중)";
+                log.info("[EXAMPLE TRANSLATION MISSING] wordId={}, spelling={}, example='{}', exampleKo='{}'",
+                        word.getId(), spelling, exampleEn, exampleKo);
+                exampleDisplay = exampleEn + " / (번역 실패)";
             }
         }
 
@@ -116,14 +129,66 @@ public class LearningServiceImpl implements LearningService {
     }
 
     private String safeTranslateToKo(String text) {
-        if (text == null || text.isBlank()) return "";
-        try {
-            String translated = translationClient.translateToKorean(text);
-            return normalize(translated);
-        } catch (Exception e) {
-            log.warn("[WORD-BOOK TRANSLATE ERROR] text={}, msg={}", text, e.getMessage());
+        if (text == null || text.isBlank()) {
             return "";
         }
+
+        log.info("[TRANSLATE IN] {}", text);
+        String deeplResult = "";
+        try {
+            deeplResult = normalize(translationClient.translateToKorean(text));
+            if (!deeplResult.isBlank()) {
+                log.info("[DEEPL OUT] {}", deeplResult);
+                return deeplResult;
+            }
+            log.info("[DEEPL OUT] <blank>");
+        } catch (Exception e) {
+            log.warn("[DEEPL FAIL] text={}", text, e);
+        }
+
+        String libreResult = translateWithLibre(text);
+        if (!libreResult.isBlank()) {
+            log.info("[LIBRE OUT] {}", libreResult);
+            return libreResult;
+        }
+        log.warn("[LIBRE OUT] <blank>");
+        return "";
+    }
+
+    private String translateWithLibre(String text) {
+        if (libreApiUrl == null || libreApiUrl.isBlank()) {
+            log.warn("[LIBRE SKIP] URL not configured");
+            return "";
+        }
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            Map<String, Object> body = new HashMap<>();
+            body.put("q", text);
+            body.put("source", "en");
+            body.put("target", "ko");
+            body.put("format", "text");
+            if (libreApiKey != null && !libreApiKey.isBlank()) {
+                body.put("api_key", libreApiKey);
+            }
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
+            var responseEntity = restTemplate.postForEntity(libreApiUrl, entity, Map.class);
+            log.info("[LIBRE STATUS] {}", responseEntity.getStatusCode());
+            log.info("[LIBRE BODY] {}", responseEntity.getBody());
+            Map<?, ?> response = responseEntity.getBody();
+            if (response != null) {
+                Object translated = response.get("translatedText");
+                if (translated instanceof String translatedText) {
+                    return normalize(translatedText);
+                }
+            }
+        } catch (org.springframework.web.client.HttpStatusCodeException e) {
+            log.warn("[LIBRE FAIL] status={}, body={}", e.getStatusCode(), e.getResponseBodyAsString(), e);
+        } catch (Exception e) {
+            log.warn("[LIBRE FAIL] text={}", text, e);
+        }
+        return "";
     }
 
     private boolean containsHangul(String value) {
@@ -141,8 +206,8 @@ public class LearningServiceImpl implements LearningService {
     }
 
     @Override
-    @Transactional
-    public void recordResult(Long memberId, Long wordId, boolean correct) {
+    @Transactional(readOnly = false)
+    public void recordResult(Integer memberId, Integer wordId, boolean correct) {
         fullLearningService.applyQuizResult(memberId, wordId, correct);
     }
 }

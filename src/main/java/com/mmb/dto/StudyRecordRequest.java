@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class StudyRecordRequest {
-    private Long wordId;
+    private Integer wordId;
     private String questionType;
     private boolean isCorrect;
     private String userAnswer;

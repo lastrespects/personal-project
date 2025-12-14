@@ -8,5 +8,5 @@ import com.mmb.entity.Word;
 
 public interface WordGenerationService {
 
-    List<Word> generateNewWordsForMember(Member member, int count, java.util.Set<Long> excludeWordIds);
+    List<Word> generateNewWordsForMember(Member member, int count, java.util.Set<Integer> excludeWordIds);
 }

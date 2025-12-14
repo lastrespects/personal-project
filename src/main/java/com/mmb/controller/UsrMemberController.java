@@ -86,7 +86,7 @@ public class UsrMemberController {
     }
 
     // 아이디 찾기 처리
-    @GetMapping("/doFindLoginId")
+    @RequestMapping(value = "/doFindLoginId", method = { RequestMethod.GET, RequestMethod.POST })
     @ResponseBody
     public ResultData<Map<String, Object>> doFindLoginId(@RequestParam String name,
             @RequestParam String email) {
@@ -100,7 +100,7 @@ public class UsrMemberController {
     }
 
     // 비밀번호 찾기 처리 (임시 비밀번호 발급)
-    @GetMapping("/doFindLoginPw")
+    @RequestMapping(value = "/doFindLoginPw", method = { RequestMethod.GET, RequestMethod.POST })
     @ResponseBody
     public ResultData<Map<String, Object>> doFindLoginPw(@RequestParam String loginId,
             @RequestParam String email) {

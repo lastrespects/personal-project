@@ -90,7 +90,7 @@ public class UsrLearningController {
         model.addAttribute("quizRemainingCount", quizRemainingCount);
 
         // 오늘의 퀴즈 단어 & 서버에서 만든 질문 목록
-        List<Word> todayWords = fullLearningService.buildTodayQuizWordsV2(member.getId());
+        List<Word> todayWords = fullLearningService.ensureTodayWords(member.getId());
         model.addAttribute("todayWords", todayWords);
 
         List<QuizQuestionDto> questions = quizQuestionService.buildQuestions(todayWords);
@@ -108,7 +108,7 @@ public class UsrLearningController {
     @PostMapping("/quiz/result")
     @ResponseBody
     public ResultData<Map<String, Object>> recordQuizResult(@RequestParam Integer wordId,
-                                                            @RequestParam boolean correct) {
+            @RequestParam boolean correct) {
 
         Integer memberId = req.getLoginedMemberId();
         if (memberId == null) {
@@ -179,9 +179,11 @@ public class UsrLearningController {
     }
 
     private String normalize(String value) {
-        if (value == null) return "";
+        if (value == null)
+            return "";
         String cleaned = value.replace("\r", " ").replace("\n", " ").trim();
-        if ("null".equalsIgnoreCase(cleaned)) return "";
+        if ("null".equalsIgnoreCase(cleaned))
+            return "";
         return cleaned;
     }
 }

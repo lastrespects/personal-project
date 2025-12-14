@@ -33,6 +33,13 @@ public class MemberService {
     @Value("${spring.mail.password:}")
     private String mailPassword;
 
+    @jakarta.annotation.PostConstruct
+    public void init() {
+        boolean hasPw = mailPassword != null && !mailPassword.isBlank();
+        System.out.println(
+                "[MemberService] MAIL_PASSWORD loaded? " + hasPw + ", len=" + (hasPw ? mailPassword.length() : 0));
+    }
+
     public boolean isUsernameTaken(String username) {
         return memberRepository.existsByUsername(username);
     }
@@ -50,7 +57,7 @@ public class MemberService {
 
     @Transactional
     public void join(String username, String password, String name, String email,
-                     String nickname, int age, String region, int dailyTarget) {
+            String nickname, int age, String region, int dailyTarget) {
 
         Member member = Member.builder()
                 .username(username)
@@ -88,7 +95,8 @@ public class MemberService {
         if (member.getDeletedAt() != null) {
             LocalDateTime now = LocalDateTime.now();
             if (member.getRestoreUntil() != null && member.getRestoreUntil().isAfter(now)) {
-                String restoreUntilStr = member.getRestoreUntil().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+                String restoreUntilStr = member.getRestoreUntil()
+                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
                 Map<String, Object> data = new HashMap<>();
                 data.put("restoreUntil", restoreUntilStr);
                 return new ResultData<>("D-1", "계정이 " + restoreUntilStr + " 까지 삭제 예약되었습니다.", data);
@@ -117,12 +125,20 @@ public class MemberService {
         Member member = memberOpt.get();
         boolean sent = sendLoginIdEmail(member.getEmail(), member.getUsername());
 
+        if (!sent) {
+            Map<String, Object> errData = new HashMap<>();
+            errData.put("emailSent", false);
+            if (mailPassword == null || mailPassword.isEmpty()) {
+                errData.put("mailError", "MailConfigurationMissing");
+            } else {
+                errData.put("mailError", "SendingFailed");
+            }
+            return new ResultData<>("F-500", "메일 발송에 실패했습니다. (관리자 문의)", errData);
+        }
+
         Map<String, Object> data = new HashMap<>();
-        data.put("emailSent", sent);
-        return new ResultData<>("S-1",
-                sent ? "아이디 안내 메일을 발송했습니다."
-                        : "아이디 안내 메일 발송에 실패했습니다.",
-                data);
+        data.put("emailSent", true);
+        return new ResultData<>("S-1", "아이디 안내 메일을 발송했습니다.", data);
     }
 
     @Transactional
@@ -138,13 +154,21 @@ public class MemberService {
         memberRepository.save(member);
 
         boolean sent = sendTempPasswordEmail(member.getEmail(), tempPw);
-        Map<String, Object> data = new HashMap<>();
-        data.put("emailSent", sent);
+        if (!sent) {
+            Map<String, Object> errData = new HashMap<>();
+            errData.put("emailSent", false);
+            if (mailPassword == null || mailPassword.isEmpty()) {
+                errData.put("mailError", "MailConfigurationMissing");
+            } else {
+                errData.put("mailError", "SendingFailed");
+            }
+            return new ResultData<>("F-500", "메일 발송에 실패했습니다. (관리자 문의)", errData);
+        }
 
-        return new ResultData<>("S-1",
-                sent ? "임시 비밀번호 메일을 발송했습니다."
-                        : "임시 비밀번호 메일 발송에 실패했습니다.",
-                data);
+        Map<String, Object> data = new HashMap<>();
+        data.put("emailSent", true);
+
+        return new ResultData<>("S-1", "임시 비밀번호 메일을 발송했습니다.", data);
     }
 
     @Transactional
@@ -196,7 +220,8 @@ public class MemberService {
     }
 
     @Transactional
-    public ResultData<Map<String, Object>> updateProfile(String username, String newNickname, String email, String region, Integer dailyTarget) {
+    public ResultData<Map<String, Object>> updateProfile(String username, String newNickname, String email,
+            String region, Integer dailyTarget) {
         Optional<Member> memberOpt = memberRepository.findByUsername(username);
         if (memberOpt.isEmpty()) {
             return new ResultData<>("F-0", "사용자를 찾을 수 없습니다.");
@@ -254,6 +279,7 @@ public class MemberService {
         String restoreUntilStr = restoreUntil.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         Map<String, Object> data = new HashMap<>();
         data.put("restoreUntil", restoreUntilStr);
+        data.put("restoreUntilStr", restoreUntilStr);
         String msg = restoreUntilStr + "까지 같은 계정으로 로그인하면 복구할 수 있습니다.";
         return new ResultData<>("S-1", msg, data);
     }
@@ -312,9 +338,11 @@ public class MemberService {
     private boolean sendEmail(String to, String subject, String htmlBody) {
         // If mail credentials are not provided, skip sending to avoid blocking calls.
         if (mailPassword == null || mailPassword.isBlank()) {
+            System.err.println("[MAIL_ERROR] mailPassword is not configured. Check .env or application.properties");
             return false;
         }
         try {
+            System.out.println("[MAIL_START] Sending email to: " + to + " | Subject: " + subject);
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             helper.setTo(to);
@@ -322,8 +350,10 @@ public class MemberService {
             helper.setText(htmlBody, true);
             helper.setFrom(mailFrom);
             mailSender.send(message);
+            System.out.println("[MAIL_SUCCESS] Sent email to " + to);
             return true;
         } catch (Exception e) {
+            System.err.println("[MAIL_FAIL] Failed to send email to " + to);
             e.printStackTrace();
             return false;
         }

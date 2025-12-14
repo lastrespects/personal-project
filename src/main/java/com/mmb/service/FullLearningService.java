@@ -42,29 +42,101 @@ public class FullLearningService {
     // =========================================================
     // 0) “오늘 고정 세트” 기반으로 단어장/퀴즈 모두 동일하게 사용
     // =========================================================
-    @Transactional(readOnly = true)
-    public List<Word> buildTodayQuizWordsV2(Integer memberId) {
-        if (memberId == null) return List.of();
+    // =========================================================
+    // 0) “오늘 고정 세트” 기반으로 단어장/퀴즈 모두 동일하게 사용
+    // =========================================================
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public List<Word> ensureTodayWords(Integer memberId) {
+        if (memberId == null)
+            return List.of();
 
         LocalDate today = LocalDate.now();
+        // 3) 목표량 변경 직후 즉시 반영 보장: 매 요청마다 DB에서 조회
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
+        int currentTarget = (member.getDailyTarget() != null) ? member.getDailyTarget() : 30;
+        if (currentTarget < 0)
+            currentTarget = 0;
 
-        return dailyWordSetRepository.findByMemberIdAndStudyDate(memberId, today)
-                .map(set -> {
-                    List<Word> fixed = loadWordsFromSet(set.getId());
-                    log.info("[DWS_HIT] memberId={} date={} setId={} words={}", memberId, today, set.getId(), fixed.size());
-                    return fixed;
-                })
-                .orElseGet(() -> {
-                    // ✅ readOnly 트랜잭션 밖/또는 readOnly여도 저장되도록 REQUIRES_NEW에서 생성
-                    List<Word> created = createTodaySetWordsTx(memberId, today);
-                    log.info("[DWS_CREATE] memberId={} date={} words={}", memberId, today, created.size());
-                    return created;
-                });
+        // 1) 오늘 세트가 있는지 확인
+        Optional<DailyWordSet> setOpt = dailyWordSetRepository.findByMemberIdAndStudyDate(memberId, today);
+        List<Word> words;
+        int beforeCount = 0;
+
+        if (setOpt.isEmpty()) {
+            // 아예 없으면 새로 생성
+            log.info("[DWS_CREATE] memberId={} date={} target={}", memberId, today, currentTarget);
+            words = createTodaySetWordsTx(memberId, today);
+            beforeCount = 0;
+        } else {
+            // 2) 있으면 가져오기
+            DailyWordSet set = setOpt.get();
+            words = loadWordsFromSet(set.getId());
+            beforeCount = words.size();
+
+            // 3) Refill: 개수 부족하면 채우기 (사용자가 목표를 늘렸을 경우)
+            if (words.size() < currentTarget) {
+                int need = currentTarget - words.size();
+                log.info("[DWS_REFILL] memberId={} exist={} target={} need={}", memberId, words.size(), currentTarget,
+                        need);
+
+                try {
+                    // 기존 단어 ID 제외
+                    Set<Integer> exclude = words.stream().map(Word::getId).collect(Collectors.toSet());
+                    List<Word> newWords = wordGenerationService.generateNewWordsForMember(member, need, exclude);
+
+                    if (!newWords.isEmpty()) {
+                        LocalDateTime now = LocalDateTime.now();
+                        List<DailyWordItem> newItems = new ArrayList<>();
+                        int nextOrder = words.size() + 1;
+
+                        for (Word w : newWords) {
+                            if (w.getId() == null)
+                                continue;
+                            newItems.add(DailyWordItem.builder()
+                                    .setId(set.getId())
+                                    .wordId(w.getId())
+                                    .sourceCode("REFILL")
+                                    .sortOrder(nextOrder++)
+                                    .regDate(now)
+                                    .build());
+                            words.add(w); // 리스트에도 추가
+                        }
+                        dailyWordItemRepository.saveAll(newItems);
+
+                        // 세트 정보 업데이트
+                        set.setTargetCount(currentTarget); // 타겟 업데이트 반영
+                        set.setUpdateDate(now);
+                        dailyWordSetRepository.save(set);
+                    }
+                } catch (Exception e) {
+                    log.error("[DWS_REFILL_FAIL] Failed to generate/save words", e);
+                    // 실패해도 기존 단어라도 반환
+                }
+            }
+        }
+
+        // 4) Truncate: list.size() > target 이면: DB 삭제하지 말고 "응답에서만" target 만큼만 잘라서 반환
+        int afterCount = words.size();
+        List<Word> finalResult = words;
+        if (words.size() > currentTarget) {
+            finalResult = new ArrayList<>(words.subList(0, currentTarget));
+        }
+
+        log.info("[ENSURE_TODAY] username={} target={} before={} after={} returned={}",
+                member.getUsername(), currentTarget, beforeCount, afterCount, finalResult.size());
+
+        return finalResult;
     }
+
+    // Deprecated adapter for backward compatibility if needed, or just removed if
+    // all callers updated.
+    // We will update callers to use ensureTodayWords.
 
     private List<Word> loadWordsFromSet(Integer setId) {
         List<DailyWordItem> items = dailyWordItemRepository.findBySetIdOrderBySortOrderAsc(setId);
-        if (items == null || items.isEmpty()) return List.of();
+        if (items == null || items.isEmpty())
+            return List.of();
 
         List<Integer> wordIds = items.stream().map(DailyWordItem::getWordId).toList();
         Map<Integer, Word> map = wordRepository.findAllById(wordIds).stream()
@@ -73,7 +145,8 @@ public class FullLearningService {
         List<Word> ordered = new ArrayList<>();
         for (Integer wid : wordIds) {
             Word w = map.get(wid);
-            if (w != null) ordered.add(w);
+            if (w != null)
+                ordered.add(w);
         }
         return ordered;
     }
@@ -81,8 +154,10 @@ public class FullLearningService {
     // ✅ 세트 생성은 “쓰기 트랜잭션”으로 강제
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public List<Word> createTodaySetWordsTx(Integer memberId, LocalDate today) {
-        if (memberId == null) return List.of();
+        if (memberId == null)
+            return List.of();
 
+        // 동시성 대비: 안에서 한번 더 조회
         // 동시성 대비: 안에서 한번 더 조회
         Optional<DailyWordSet> existing = dailyWordSetRepository.findByMemberIdAndStudyDate(memberId, today);
         if (existing.isPresent()) {
@@ -91,7 +166,8 @@ public class FullLearningService {
 
         Member member = memberRepository.findById(memberId).orElse(null);
         int targetCount = (member != null && member.getDailyTarget() != null) ? member.getDailyTarget() : 30;
-        if (targetCount < 0) targetCount = 0;
+        if (targetCount < 0)
+            targetCount = 0;
 
         log.info("[DWS_BUILD] memberId={} date={} targetCount={}", memberId, today, targetCount);
 
@@ -150,7 +226,8 @@ public class FullLearningService {
         List<DailyWordItem> items = new ArrayList<>();
         int order = 1;
         for (Pick p : finalList) {
-            if (p.word == null || p.word.getId() == null) continue;
+            if (p.word == null || p.word.getId() == null)
+                continue;
             items.add(DailyWordItem.builder()
                     .setId(savedSet.getId())
                     .wordId(p.word.getId())
@@ -173,24 +250,30 @@ public class FullLearningService {
     }
 
     private void addWords(LinkedHashMap<Integer, Pick> picked, List<Word> words, String source, int limit) {
-        if (words == null) return;
+        if (words == null)
+            return;
         for (Word w : words) {
-            if (picked.size() >= limit) return;
-            if (w == null || w.getId() == null) continue;
+            if (picked.size() >= limit)
+                return;
+            if (w == null || w.getId() == null)
+                continue;
             picked.putIfAbsent(w.getId(), new Pick(w, source));
         }
     }
 
     private void deterministicShuffle(List<Pick> list, Integer memberId, LocalDate date) {
-        if (list == null || list.size() <= 1) return;
+        if (list == null || list.size() <= 1)
+            return;
         long seed = date.toEpochDay();
-        if (memberId != null) seed ^= memberId;
+        if (memberId != null)
+            seed ^= memberId;
         Collections.shuffle(list, new Random(seed));
     }
 
     private static class Pick {
         final Word word;
         final String sourceCode;
+
         Pick(Word word, String sourceCode) {
             this.word = word;
             this.sourceCode = sourceCode;
@@ -210,7 +293,8 @@ public class FullLearningService {
     // =========================================================
     @Transactional(readOnly = true)
     public List<Word> getTodayLearnedWords(Integer memberId) {
-        if (memberId == null) return List.of();
+        if (memberId == null)
+            return List.of();
         LocalDate today = LocalDate.now();
         LocalDateTime start = today.atStartOfDay();
         LocalDateTime end = today.plusDays(1).atStartOfDay();
@@ -220,7 +304,8 @@ public class FullLearningService {
     // ✅ 메인에서 쓰는 메서드: (에러 해결용)
     @Transactional(readOnly = true)
     public long getTodayLearnedCount(Integer memberId) {
-        if (memberId == null) return 0;
+        if (memberId == null)
+            return 0;
         LocalDate today = LocalDate.now();
         LocalDateTime start = today.atStartOfDay();
         LocalDateTime end = today.plusDays(1).atStartOfDay();
@@ -233,7 +318,8 @@ public class FullLearningService {
     // =========================================================
     @Transactional(readOnly = true)
     public List<Word> getLearnedWordsInLastDays(Integer memberId, int days) {
-        if (memberId == null) return List.of();
+        if (memberId == null)
+            return List.of();
         LocalDateTime since = LocalDate.now().minusDays(days).atStartOfDay();
         return studyRecordRepository.findStudiedWordsSince(memberId, since);
     }
@@ -243,7 +329,8 @@ public class FullLearningService {
     // =========================================================
     @Transactional(readOnly = true)
     public List<Word> getRecentLearnedWords(Integer memberId, int limit) {
-        if (memberId == null) return List.of();
+        if (memberId == null)
+            return List.of();
         List<Word> all = studyRecordRepository.findRecentStudiedWords(memberId);
         return all.stream().distinct().limit(limit).collect(Collectors.toList());
     }
@@ -253,7 +340,8 @@ public class FullLearningService {
     // =========================================================
     @Transactional(readOnly = true)
     public int getDailyTarget(Integer memberId) {
-        if (memberId == null) return 30;
+        if (memberId == null)
+            return 30;
         return memberRepository.findById(memberId)
                 .map(Member::getDailyTarget)
                 .orElse(30);
@@ -272,7 +360,8 @@ public class FullLearningService {
     // =========================================================
     @Transactional(readOnly = true)
     public long getTodayQuizSolvedCount(Integer memberId) {
-        if (memberId == null) return 0;
+        if (memberId == null)
+            return 0;
         LocalDate today = LocalDate.now();
         LocalDateTime start = today.atStartOfDay();
         LocalDateTime end = today.plusDays(1).atStartOfDay();
@@ -284,7 +373,8 @@ public class FullLearningService {
     // =========================================================
     @Transactional(readOnly = true)
     public long getTodayBookStudyCount(Integer memberId) {
-        if (memberId == null) return 0;
+        if (memberId == null)
+            return 0;
         LocalDate today = LocalDate.now();
         LocalDateTime start = today.atStartOfDay();
         LocalDateTime end = today.plusDays(1).atStartOfDay();
@@ -296,9 +386,11 @@ public class FullLearningService {
     // =========================================================
     @Transactional(readOnly = true)
     public List<StudyRecord> getRecentStudyRecords(Integer memberId, int limit) {
-        if (memberId == null) return List.of();
+        if (memberId == null)
+            return List.of();
         List<StudyRecord> records = studyRecordRepository.findTop100ByMemberIdOrderByStudiedAtDesc(memberId);
-        if (limit <= 0 || records.size() <= limit) return records;
+        if (limit <= 0 || records.size() <= limit)
+            return records;
         return records.subList(0, limit);
     }
 }

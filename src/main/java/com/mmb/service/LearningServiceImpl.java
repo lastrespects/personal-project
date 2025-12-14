@@ -38,7 +38,7 @@ public class LearningServiceImpl implements LearningService {
     private String libreApiKey;
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(rollbackFor = Exception.class)
     public List<TodayWordDto> prepareTodayWords(Integer memberId) {
         if (memberId == null) {
             throw new IllegalArgumentException("memberId is required");
@@ -46,7 +46,7 @@ public class LearningServiceImpl implements LearningService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found: " + memberId));
 
-        List<Word> words = fullLearningService.buildTodayQuizWordsV2(member.getId());
+        List<Word> words = fullLearningService.ensureTodayWords(member.getId());
         log.info("[WORDBOOK_SERVICE] memberId={} fetchedWords={}", memberId, words == null ? 0 : words.size());
         if (words == null || words.isEmpty()) {
             return List.of();
@@ -122,7 +122,8 @@ public class LearningServiceImpl implements LearningService {
     }
 
     private String lookupDictionary(String spelling) {
-        if (spelling == null) return "";
+        if (spelling == null)
+            return "";
         String value = LocalMeaningDictionary.MEANINGS
                 .getOrDefault(spelling.toLowerCase(Locale.ROOT), "");
         return normalize(value);
@@ -196,12 +197,14 @@ public class LearningServiceImpl implements LearningService {
     }
 
     private String normalize(String value) {
-        if (value == null) return "";
+        if (value == null)
+            return "";
         String cleaned = value
                 .replace("\r", " ")
                 .replace("\n", " ")
                 .trim();
-        if ("null".equalsIgnoreCase(cleaned)) return "";
+        if ("null".equalsIgnoreCase(cleaned))
+            return "";
         return cleaned;
     }
 

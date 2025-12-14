@@ -17,10 +17,12 @@ import java.nio.charset.StandardCharsets;
 public class ExampleSentenceService {
 
     private final WordRepository wordRepository;
+    private final org.springframework.transaction.PlatformTransactionManager transactionManager;
 
     // ExampleSentenceService: generates or fetches example sentences for words.
     public String findOrGenerateExample(Word word) {
-        if (word == null) return "";
+        if (word == null)
+            return "";
 
         String existing = normalize(word.getExampleSentence());
         if (!existing.isBlank()) {
@@ -33,8 +35,15 @@ public class ExampleSentenceService {
         }
 
         try {
-            word.setExampleSentence(example);
-            wordRepository.save(word);
+            org.springframework.transaction.support.TransactionTemplate template = new org.springframework.transaction.support.TransactionTemplate(
+                    transactionManager);
+            template.setPropagationBehavior(
+                    org.springframework.transaction.TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+
+            template.execute(status -> {
+                word.setExampleSentence(example);
+                return wordRepository.save(word);
+            });
         } catch (Exception e) {
             log.warn("[EXAMPLE SAVE FAIL] wordId={}, msg={}", word.getId(), e.getMessage());
         }
@@ -43,7 +52,8 @@ public class ExampleSentenceService {
     }
 
     private String fetchFromDictionaryApi(String spelling) {
-        if (spelling.isBlank()) return "";
+        if (spelling.isBlank())
+            return "";
 
         try {
             String encoded = UriUtils.encode(spelling, StandardCharsets.UTF_8);
@@ -51,7 +61,8 @@ public class ExampleSentenceService {
 
             RestTemplate restTemplate = new RestTemplate();
             JsonNode[] body = restTemplate.getForObject(url, JsonNode[].class);
-            if (body == null || body.length == 0) return "";
+            if (body == null || body.length == 0)
+                return "";
 
             JsonNode meanings = body[0].path("meanings");
             for (JsonNode meaningNode : meanings) {
@@ -71,11 +82,13 @@ public class ExampleSentenceService {
     }
 
     private String normalize(String value) {
-        if (value == null) return "";
+        if (value == null)
+            return "";
         String cleaned = value.replace("\r", " ")
-                              .replace("\n", " ")
-                              .trim();
-        if ("null".equalsIgnoreCase(cleaned)) return "";
+                .replace("\n", " ")
+                .trim();
+        if ("null".equalsIgnoreCase(cleaned))
+            return "";
         return cleaned;
     }
 }

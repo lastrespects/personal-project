@@ -30,13 +30,15 @@ public class WordGenerationServiceImpl implements WordGenerationService {
     private final WordWriteService wordWriteService;
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED)
     public List<Word> generateNewWordsForMember(Member member, int count, Set<Integer> excludeWordIds) {
 
         List<Word> result = new ArrayList<>();
-        if (count <= 0) return result;
+        if (count <= 0)
+            return result;
 
-        if (excludeWordIds == null) excludeWordIds = new HashSet<>();
+        if (excludeWordIds == null)
+            excludeWordIds = new HashSet<>();
         Set<String> batchSpellings = new HashSet<>();
 
         int attempts = 0;
@@ -47,10 +49,12 @@ public class WordGenerationServiceImpl implements WordGenerationService {
 
             String raw = randomWordProvider.getRandomEnglishWord();
             String spelling = normalizeSpelling(raw);
-            if (spelling.isBlank()) continue;
+            if (spelling.isBlank())
+                continue;
 
             // 같은 배치 내 중복 방지
-            if (!batchSpellings.add(spelling)) continue;
+            if (!batchSpellings.add(spelling))
+                continue;
 
             // 1) DB에 이미 있으면 그대로 사용
             Optional<Word> existing = wordRepository.findFirstBySpellingIgnoreCase(spelling);
@@ -75,7 +79,8 @@ public class WordGenerationServiceImpl implements WordGenerationService {
             String audioUrl = dict != null ? safe(dict.getFirstAudioUrlOrNull()) : "";
             String englishDef = dict != null ? safe(dict.getFirstDefinitionOrNull()) : "";
 
-            if (englishDef.isBlank()) englishDef = spelling;
+            if (englishDef.isBlank())
+                englishDef = spelling;
 
             String meaningKo = "";
             try {
@@ -87,7 +92,8 @@ public class WordGenerationServiceImpl implements WordGenerationService {
             if (meaningKo.isBlank()) {
                 meaningKo = safe(LOCAL_MEANINGS.getOrDefault(spelling, ""));
             }
-            if (meaningKo.isBlank()) meaningKo = englishDef;
+            if (meaningKo.isBlank())
+                meaningKo = englishDef;
 
             Word word = Word.builder()
                     .spelling(spelling)
@@ -97,7 +103,13 @@ public class WordGenerationServiceImpl implements WordGenerationService {
                     .build();
 
             // ✅ 여기서 중복키가 나도 WordWriteService가 "기존 단어"를 반환하게 됨
-            Word savedOrExisting = wordWriteService.saveNewWord(word);
+            Word savedOrExisting = null;
+            try {
+                savedOrExisting = wordWriteService.saveNewWord(word);
+            } catch (Exception e) {
+                log.warn("[WORD_GEN_FAIL] spelling={} msg={}", spelling, e.getMessage());
+                continue;
+            }
 
             if (savedOrExisting.getId() != null && excludeWordIds.contains(savedOrExisting.getId())) {
                 continue;
@@ -108,17 +120,25 @@ public class WordGenerationServiceImpl implements WordGenerationService {
 
         // 마지막 fallback(로컬 사전)로 채우기
         if (result.size() < count) {
-            for (String spelling : LOCAL_MEANINGS.keySet()) {
-                if (result.size() >= count) break;
+            log.info("[WORD_GEN_FALLBACK] Needed={}, Current={}, Checking Local Dictionary...", count, result.size());
+            List<String> keys = new ArrayList<>(LOCAL_MEANINGS.keySet());
+            Collections.shuffle(keys); // Randomize local selection
+
+            for (String spelling : keys) {
+                if (result.size() >= count)
+                    break;
 
                 String norm = normalizeSpelling(spelling);
-                if (norm.isBlank()) continue;
-                if (!batchSpellings.add(norm)) continue;
+                if (norm.isBlank())
+                    continue;
+                if (!batchSpellings.add(norm))
+                    continue;
 
                 Optional<Word> existing = wordRepository.findFirstBySpellingIgnoreCase(norm);
                 if (existing.isPresent()) {
                     Word w = existing.get();
-                    if (w.getId() != null && excludeWordIds.contains(w.getId())) continue;
+                    if (w.getId() != null && excludeWordIds.contains(w.getId()))
+                        continue;
                     addUniqueById(result, w, count);
                     continue;
                 }
@@ -130,25 +150,35 @@ public class WordGenerationServiceImpl implements WordGenerationService {
                         .audioPath(null)
                         .build();
 
-                Word savedOrExisting = wordWriteService.saveNewWord(w);
-                if (savedOrExisting.getId() != null && excludeWordIds.contains(savedOrExisting.getId())) continue;
-                addUniqueById(result, savedOrExisting, count);
+                try {
+                    Word savedOrExisting = wordWriteService.saveNewWord(w);
+                    if (savedOrExisting.getId() != null && excludeWordIds.contains(savedOrExisting.getId()))
+                        continue;
+                    addUniqueById(result, savedOrExisting, count);
+                } catch (Exception e) {
+                    log.warn("[WORD_SAVE_FAIL] spelling={}", norm, e);
+                }
             }
         }
 
+        log.info("[WORD_GEN_DONE] Requested={}, Generated={}", count, result.size());
         return result;
     }
 
     private void addUniqueById(List<Word> result, Word w, int count) {
-        if (w == null || w.getId() == null) return;
+        if (w == null || w.getId() == null)
+            return;
         for (Word x : result) {
-            if (x != null && x.getId() != null && x.getId().equals(w.getId())) return;
+            if (x != null && x.getId() != null && x.getId().equals(w.getId()))
+                return;
         }
-        if (result.size() < count) result.add(w);
+        if (result.size() < count)
+            result.add(w);
     }
 
     private String normalizeSpelling(String s) {
-        if (s == null) return "";
+        if (s == null)
+            return "";
         return s.replace("\r", " ")
                 .replace("\n", " ")
                 .trim()

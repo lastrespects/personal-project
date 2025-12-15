@@ -89,14 +89,22 @@ public class UsrLearningController {
         model.addAttribute("quizSolvedCount", quizSolvedCount);
         model.addAttribute("quizRemainingCount", quizRemainingCount);
 
+        // ✅ 정답 개수 추가 (서버 기준)
+        long quizCorrectCount = fullLearningService.getTodayQuizCorrectCount(member.getId());
+        model.addAttribute("quizCorrectCount", quizCorrectCount);
+
         // 오늘의 퀴즈 단어 & 서버에서 만든 질문 목록
         List<Word> todayWords = fullLearningService.ensureTodayWords(member.getId());
         model.addAttribute("todayWords", todayWords);
 
-        List<QuizQuestionDto> questions = quizQuestionService.buildQuestions(todayWords);
+        // List<QuizQuestionDto> questions =
+        // quizQuestionService.buildQuestions(todayWords);
+
+        model.addAttribute("dailyTarget", todayTarget);
 
         try {
-            model.addAttribute("questionsJson", objectMapper.writeValueAsString(questions));
+            // ✅ 클라이언트 사이드(quiz.jsp)의 풍부한 문제 생성 로직(buildQuestionsMixed)을 사용하기 위해
+            // 서버에서는 구체적인 문제 목록(questionsJson)을 내려주지 않고, 단어 목록(wordsJson)만 내려줍니다.
             model.addAttribute("wordsJson", objectMapper.writeValueAsString(buildWordFallback(todayWords)));
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("Failed to serialize quiz data.", e);
@@ -135,6 +143,10 @@ public class UsrLearningController {
         Map<String, Object> data = new HashMap<>();
         data.put("quizSolvedCount", quizSolvedCount);
         data.put("quizRemainingCount", quizRemainingCount);
+
+        // ✅ 정답 개수 추가
+        long quizCorrectCount = fullLearningService.getTodayQuizCorrectCount(memberId);
+        data.put("quizCorrectCount", quizCorrectCount);
 
         return ResultData.from("S-1", "QUIZ_RESULT_SAVED", data);
     }

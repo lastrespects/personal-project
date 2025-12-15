@@ -1,114 +1,123 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>로그인 - My Memory Book</title>
-<script>
-    // 페이지 로드 시 msg 파라미터가 있으면 alert 표시
-    window.onload = function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const msg = urlParams.get('msg');
-        if (msg) {
-            alert(decodeURIComponent(msg));
-        }
-    };
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+    <!DOCTYPE html>
+    <html>
 
-    function pickRestoreUntil(res) {
-        const root = res || {};
-        const rsData = root.rsData || root.data || (root.resultData && root.resultData.rsData) || {};
-        const v = rsData.restoreUntil ?? rsData.restoreUntilStr ?? rsData.restoreDate ?? rsData.restore_until ?? "";
-        const s = String(v ?? "").trim();
-        return s.length > 0 ? s : "";
-    }
-    function loginFormSubmit(form) {
-        const usernameInput = form.username;
-        const passwordInput = form.password;
-        const username = usernameInput.value.trim();
-        const password = passwordInput.value.trim();
+    <head>
+        <meta charset="UTF-8">
+        <title>로그인 - My Memory Book</title>
+        <script>
+            // ✅ 페이지 로드 시 msg 파라미터가 있으면 alert 표시 (한 번만)
+            window.onload = function () {
+                const url = new URL(window.location.href);
+                const msg = url.searchParams.get('msg'); // URLSearchParams는 기본적으로 디코딩된 값으로 줌
 
-        if (username.length === 0) {
-            alert("아이디를 입력해주세요.");
-            usernameInput.focus();
-            return false;
-        }
+                if (msg && msg.trim().length > 0) {
+                    alert(msg); // ✅ decodeURIComponent 다시 하지 말 것(중복 디코딩 위험)
 
-        if (password.length === 0) {
-            alert("비밀번호를 입력해주세요.");
-            passwordInput.focus();
-            return false;
-        }
+                    // ✅ 새로고침해도 계속 뜨지 않도록 msg 제거
+                    url.searchParams.delete('msg');
+                    history.replaceState(null, '', url.pathname + (url.searchParams.toString() ? '?' + url.searchParams.toString() : ''));
+                }
+            };
 
-        fetch('/usr/member/validLoginInfo', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ username, password })
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (data.rsCode) {
-                    if (data.rsCode.startsWith('F-')) {
-                        alert(data.rsMsg || '로그인 정보가 올바르지 않습니다.');
-                        return;
-                    }
-                    if (data.rsCode === 'D-1') {
-                        const restoreData = data.rsData || data.data || {};
-                        const restoreUntil = pickRestoreUntil(data);
-                        const baseMsg = String(data.rsMsg || data.msg || '').trim();
-                        const fallbackMsg = '7일 이내에 같은 계정으로 로그인하면 복구할 수 있습니다.';
-                        const restoreNotice = restoreUntil.length > 0
-                                ? `${restoreUntil}까지 같은 계정으로 로그인하면 복구할 수 있습니다.`
-                                : (baseMsg.length > 0 ? baseMsg : fallbackMsg);
-                        const nickname = restoreData.nickname ? restoreData.nickname : '';
-                        const welcomeName = nickname ? `${nickname}님, ` : '';
-                        const confirmRestore = confirm(`${welcomeName}탈퇴 상태의 계정입니다.\n${restoreNotice}\n바로 복구를 진행하시겠습니까?`);
-                        if (!confirmRestore) {
-                            return;
-                        }
-                        return fetch('/usr/member/restore', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                            body: new URLSearchParams({ username, password })
-                        })
-                        .then(res2 => res2.json())
-                        .then(res2 => {
-                            if (!res2.rsCode || !res2.rsCode.startsWith('S-')) {
-                                alert(res2.rsMsg || '계정 복구에 실패했습니다.');
-                                return;
-                            }
-                            alert('계정을 복구했습니다. 다시 로그인합니다.');
-                            form.submit();
-                        })
-                        .catch(() => alert('복구 요청 중 오류가 발생했습니다.'));
-                    }
+            function pickRestoreUntil(res) {
+                const root = res || {};
+                const rsData = root.rsData || root.data || (root.resultData && root.resultData.rsData) || {};
+                const v = rsData.restoreUntil ?? rsData.restoreUntilStr ?? rsData.restoreDate ?? rsData.restore_until ?? "";
+                const s = String(v ?? "").trim();
+                return s.length > 0 ? s : "";
+            }
+
+            function loginFormSubmit(form) {
+                const usernameInput = form.username;
+                const passwordInput = form.password;
+                const username = usernameInput.value.trim();
+                const password = passwordInput.value.trim();
+
+                if (username.length === 0) {
+                    alert("아이디를 입력해주세요.");
+                    usernameInput.focus();
+                    return false;
                 }
 
-                usernameInput.value = username;
-                passwordInput.value = password;
-                form.submit();
-            })
-            .catch(() => {
-                alert('로그인 요청 중 오류가 발생했습니다.');
-            });
+                if (password.length === 0) {
+                    alert("비밀번호를 입력해주세요.");
+                    passwordInput.focus();
+                    return false;
+                }
 
-        return false;
-    }
-</script>
-</head>
-<body>
-    <div style="text-align:center; margin-top:100px;">
-        <h1>로그인</h1>
-        <form action="/doLogin" method="post" onsubmit="return loginFormSubmit(this);">
-            <input type="text" name="username" placeholder="아이디" required><br><br>
-            <input type="password" name="password" placeholder="비밀번호" required><br><br>
-            <button type="submit">로그인</button>
-            <button type="button" onclick="location.href='/usr/member/join'">회원가입</button>
-            <button type="button" onclick="location.href='/usr/home/main'">메인으로 돌아가기</button>
-        </form>
-        <div style="margin-top:12px;">
-            <a href="/usr/member/findLoginId" style="margin-right:10px;">아이디 찾기</a>
-            <a href="/usr/member/findLoginPw">비밀번호 찾기</a>
+                fetch('/usr/member/validLoginInfo', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ username, password })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.rsCode) {
+                            if (data.rsCode.startsWith('F-')) {
+                                alert(data.rsMsg || '로그인 정보가 올바르지 않습니다.');
+                                return;
+                            }
+                            if (data.rsCode === 'D-1') {
+                                const restoreData = data.rsData || data.data || {};
+                                const restoreUntil = pickRestoreUntil(data);
+                                const baseMsg = String(data.rsMsg || data.msg || '').trim();
+                                const fallbackMsg = '7일 이내에 같은 계정으로 로그인하면 복구할 수 있습니다.';
+                                const restoreNotice = restoreUntil.length > 0
+                                    ? `\${restoreUntil}까지 같은 계정으로 로그인하면 복구할 수 있습니다.`
+                                    : (baseMsg.length > 0 ? baseMsg : fallbackMsg);
+
+                                const nickname = restoreData.nickname ? restoreData.nickname : '';
+                                const welcomeName = nickname ? `${nickname}님, ` : '';
+                                const confirmRestore = confirm(`${welcomeName}탈퇴 상태의 계정입니다.\n${restoreNotice}\n바로 복구를 진행하시겠습니까?`);
+                                if (!confirmRestore) return;
+
+                                return fetch('/usr/member/restore', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                    body: new URLSearchParams({ username, password })
+                                })
+                                    .then(res2 => res2.json())
+                                    .then(res2 => {
+                                        if (!res2.rsCode || !res2.rsCode.startsWith('S-')) {
+                                            alert(res2.rsMsg || '계정 복구에 실패했습니다.');
+                                            return;
+                                        }
+                                        alert('계정을 복구했습니다. 다시 로그인합니다.');
+                                        form.submit();
+                                    })
+                                    .catch(() => alert('복구 요청 중 오류가 발생했습니다.'));
+                            }
+                        }
+
+                        usernameInput.value = username;
+                        passwordInput.value = password;
+                        form.submit();
+                    })
+                    .catch(() => {
+                        alert('로그인 요청 중 오류가 발생했습니다.');
+                    });
+
+                return false;
+            }
+        </script>
+    </head>
+
+    <body>
+        <div style="text-align:center; margin-top:100px;">
+            <h1>로그인</h1>
+            <form action="/doLogin" method="post" onsubmit="return loginFormSubmit(this);">
+                <input type="text" name="username" placeholder="아이디" required><br><br>
+                <input type="password" name="password" placeholder="비밀번호" required><br><br>
+                <button type="submit">로그인</button>
+                <button type="button" onclick="location.href='/usr/member/join'">회원가입</button>
+                <button type="button" onclick="location.href='/usr/home/main'">메인으로 돌아가기</button>
+            </form>
+            <div style="margin-top:12px;">
+                <a href="/usr/member/findLoginId" style="margin-right:10px;">아이디 찾기</a>
+                <a href="/usr/member/findLoginPw">비밀번호 찾기</a>
+            </div>
         </div>
-    </div>
-</body>
-</html>
+    </body>
+
+    </html>

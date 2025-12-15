@@ -369,15 +369,32 @@ public class FullLearningService {
     }
 
     // =========================================================
-    // 8) 오늘 단어장(BOOK) 학습한 개수
+    // 7-1) 오늘 퀴즈 정답 개수
+    // =========================================================
+    @Transactional(readOnly = true)
+    public long getTodayQuizCorrectCount(Integer memberId) {
+        if (memberId == null)
+            return 0;
+
+        LocalDate today = LocalDate.now();
+        LocalDateTime start = today.atStartOfDay();
+        LocalDateTime end = today.plusDays(1).atStartOfDay();
+
+        return studyRecordRepository.countQuizCorrect(memberId, start, end);
+    }
+
+    // =========================================================
+    // 8) 오늘 단어장(BOOK) 학습 수
     // =========================================================
     @Transactional(readOnly = true)
     public long getTodayBookStudyCount(Integer memberId) {
         if (memberId == null)
             return 0;
+
         LocalDate today = LocalDate.now();
         LocalDateTime start = today.atStartOfDay();
         LocalDateTime end = today.plusDays(1).atStartOfDay();
+
         return studyRecordRepository.countByMemberIdAndStudyTypeAndStudiedAtBetween(memberId, "BOOK", start, end);
     }
 

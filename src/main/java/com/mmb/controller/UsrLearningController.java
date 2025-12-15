@@ -2,7 +2,6 @@ package com.mmb.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mmb.dto.QuizQuestionDto;
 import com.mmb.dto.Req;
 import com.mmb.dto.ResultData;
 import com.mmb.dto.TodayWordDto;
@@ -16,21 +15,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
-@RequestMapping("/learning")
+@RequestMapping("/learning") // ✅ 여기서 /learning 으로 통일
 @RequiredArgsConstructor
 @Slf4j
 public class UsrLearningController {
@@ -38,7 +28,7 @@ public class UsrLearningController {
     private final LearningService learningService;
     private final FullLearningService fullLearningService;
     private final MemberService memberService;
-    private final QuizQuestionService quizQuestionService;
+    private final QuizQuestionService quizQuestionService; // (지금은 안 쓰지만 의존성 유지)
     private final ObjectMapper objectMapper;
     private final Req req;
 
@@ -68,55 +58,61 @@ public class UsrLearningController {
             model.addAttribute("todayWords", List.of());
             model.addAttribute("wordbookError", "단어장을 불러오는 중 오류가 발생했습니다: " + e.getMessage());
         }
+
         model.addAttribute("dailyTarget", dailyTarget);
         return "usr/learning/wordbook";
     }
 
     @GetMapping("/quiz")
-    public String showQuiz(Model model, Principal principal) {
-        if (principal == null) {
-            return "redirect:/login?msg=PleaseLogin";
+    public String showQuiz(Model model) {
+        Integer memberId = req.getLoginedMemberId();
+        if (memberId == null) {
+            return "redirect:/usr/member/login?error=1";
         }
 
-        Member member = memberService.findByUsername(principal.getName())
-                .orElseThrow(() -> new IllegalArgumentException("Member not found."));
+        Member member = req.getLoginedMember();
+        if (member == null) {
+            member = memberService.findById(memberId)
+                    .orElseThrow(() -> new IllegalArgumentException("Member not found."));
+        }
 
-        // ✅ 메인/학습로그와 동일한 기준으로 오늘 푼 문제/남은 문제 계산
+        model.addAttribute("memberId", member.getId());
+
         long quizSolvedCount = fullLearningService.getTodayQuizSolvedCount(member.getId());
         int todayTarget = fullLearningService.getDailyTarget(member.getId());
         long quizRemainingCount = Math.max(todayTarget - quizSolvedCount, 0);
+        long quizCorrectCount = fullLearningService.getTodayQuizCorrectCount(member.getId());
 
         model.addAttribute("quizSolvedCount", quizSolvedCount);
         model.addAttribute("quizRemainingCount", quizRemainingCount);
-
-        // ✅ 정답 개수 추가 (서버 기준)
-        long quizCorrectCount = fullLearningService.getTodayQuizCorrectCount(member.getId());
         model.addAttribute("quizCorrectCount", quizCorrectCount);
+        model.addAttribute("dailyTarget", todayTarget);
 
-        // 오늘의 퀴즈 단어 & 서버에서 만든 질문 목록
         List<Word> todayWords = fullLearningService.ensureTodayWords(member.getId());
         model.addAttribute("todayWords", todayWords);
 
-        // List<QuizQuestionDto> questions =
-        // quizQuestionService.buildQuestions(todayWords);
-
-        model.addAttribute("dailyTarget", todayTarget);
-
         try {
-            // ✅ 클라이언트 사이드(quiz.jsp)의 풍부한 문제 생성 로직(buildQuestionsMixed)을 사용하기 위해
-            // 서버에서는 구체적인 문제 목록(questionsJson)을 내려주지 않고, 단어 목록(wordsJson)만 내려줍니다.
-            model.addAttribute("wordsJson", objectMapper.writeValueAsString(buildWordFallback(todayWords)));
+            String json = objectMapper.writeValueAsString(buildWordFallback(todayWords));
+
+            // ✅ <script> 깨짐/보안 방지 (JSON을 JS로 직접 주입할 때 필수)
+            json = json.replace("<", "\\u003c")
+                       .replace(">", "\\u003e")
+                       .replace("&", "\\u0026");
+
+            model.addAttribute("wordsJson", json);
         } catch (JsonProcessingException e) {
-            throw new IllegalStateException("Failed to serialize quiz data.", e);
+            log.error("[QUIZ_JSON_FAIL] memberId={}", memberId, e);
+            // 실패해도 화면은 뜨게
+            model.addAttribute("wordsJson", "[]");
         }
 
         return "usr/learning/quiz";
     }
 
-    @PostMapping("/quiz/result")
+    @PostMapping("/quiz/result") // ✅ 저장도 /learning/quiz/result 로 통일
     @ResponseBody
     public ResultData<Map<String, Object>> recordQuizResult(@RequestParam Integer wordId,
-            @RequestParam boolean correct) {
+                                                            @RequestParam boolean correct) {
 
         Integer memberId = req.getLoginedMemberId();
         if (memberId == null) {
@@ -131,51 +127,40 @@ public class UsrLearningController {
         try {
             fullLearningService.applyQuizResult(memberId, wordId, correct);
         } catch (Exception e) {
-            log.error("[WRITE_FAIL] endpoint=/learning/quiz/result memberId={}, wordId={}", memberId, wordId, e);
-            String message = e.getMessage() != null ? e.getMessage() : "퀴즈 저장에 실패했습니다.";
+            log.error("[QUIZ_SAVE_FAIL] endpoint=/learning/quiz/result memberId={}, wordId={}", memberId, wordId, e);
+            String message = (e.getMessage() != null && !e.getMessage().isBlank())
+                    ? e.getMessage()
+                    : "퀴즈 저장에 실패했습니다.";
             return ResultData.from("F-500", message);
         }
 
         long quizSolvedCount = fullLearningService.getTodayQuizSolvedCount(memberId);
         int todayTarget = fullLearningService.getDailyTarget(memberId);
         long quizRemainingCount = Math.max(todayTarget - quizSolvedCount, 0);
+        long quizCorrectCount = fullLearningService.getTodayQuizCorrectCount(memberId);
 
         Map<String, Object> data = new HashMap<>();
         data.put("quizSolvedCount", quizSolvedCount);
         data.put("quizRemainingCount", quizRemainingCount);
-
-        // ✅ 정답 개수 추가
-        long quizCorrectCount = fullLearningService.getTodayQuizCorrectCount(memberId);
         data.put("quizCorrectCount", quizCorrectCount);
 
         return ResultData.from("S-1", "QUIZ_RESULT_SAVED", data);
     }
 
-    // ✅ quiz.jsp에서 fallback wordsJson으로 쓰는 데이터
     private List<Map<String, Object>> buildWordFallback(List<Word> todayWords) {
         List<Map<String, Object>> list = new ArrayList<>();
-
-        if (todayWords == null) {
-            return list;
-        }
+        if (todayWords == null) return list;
 
         for (Word w : todayWords) {
-            if (w == null) {
-                continue;
-            }
+            if (w == null) continue;
 
             String spelling = normalize(w.getSpelling());
             String meaning = normalize(w.getMeaning());
             String example = normalize(w.getExampleSentence());
             String audioPath = normalize(w.getAudioPath());
 
-            if (spelling.isBlank()) {
-                continue;
-            }
-
-            if (meaning.isBlank()) {
-                meaning = "의미 미확인";
-            }
+            if (spelling.isBlank()) continue;
+            if (meaning.isBlank()) meaning = "의미 미확인";
 
             Map<String, Object> item = new LinkedHashMap<>();
             item.put("id", w.getId() == null ? -1 : w.getId());
@@ -186,16 +171,13 @@ public class UsrLearningController {
 
             list.add(item);
         }
-
         return list;
     }
 
     private String normalize(String value) {
-        if (value == null)
-            return "";
+        if (value == null) return "";
         String cleaned = value.replace("\r", " ").replace("\n", " ").trim();
-        if ("null".equalsIgnoreCase(cleaned))
-            return "";
+        if ("null".equalsIgnoreCase(cleaned)) return "";
         return cleaned;
     }
 }

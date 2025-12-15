@@ -1,34 +1,52 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/mmb.css">
     <title>글쓰기</title>
+
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h1 { margin-bottom: 12px; }
-        form { max-width: 720px; }
-        label { display: block; margin-top: 12px; font-weight: bold; }
-        input[type="text"], textarea { width: 100%; padding: 10px; border: 1px solid #ccc; }
-        textarea { height: 240px; resize: vertical; }
-        .actions { margin-top: 14px; display: flex; gap: 8px; }
-        .actions button, .actions a { padding: 8px 12px; border: 1px solid #333; background: #fff; text-decoration: none; }
+        /* 이 페이지에서만 필요한 배치만 최소로 */
+        .form-wrap{ max-width: 860px; margin: 0 auto; }
+        .form-card{ padding: 22px; }
+        .form-title{ margin: 0 0 14px; font-size: 22px; font-weight: 900; letter-spacing: -0.4px; }
+        .form-grid{ display: grid; gap: 12px; }
+        .form-label{ font-weight: 800; color: var(--text); }
+        .actions{ margin-top: 14px; display:flex; gap:10px; justify-content:flex-end; }
+        textarea{ min-height: 340px; } /* 내용칸 크게 */
     </style>
 </head>
+
 <body>
-    <h1>글쓰기</h1>
-    <form action="/usr/article/doWrite" method="post">
-        <input type="hidden" name="boardId" value="${boardId}" />
-        <label>제목</label>
-        <input type="text" name="title" required />
+<%@ include file="/view/usr/common/header.jsp" %>
 
-        <label>내용</label>
-        <textarea name="content" required></textarea>
+<div class="form-wrap">
+    <div class="card form-card">
+        <h1 class="form-title">글쓰기</h1>
 
-        <div class="actions">
-            <button type="submit">등록</button>
-            <a href="javascript:history.back();">취소</a>
-        </div>
-    </form>
+        <form action="/usr/article/doWrite" method="post" class="form-grid">
+            <input type="hidden" name="boardId" value="${boardId}" />
+
+            <div class="form-grid">
+                <label class="form-label">제목</label>
+                <input type="text" name="title" required />
+            </div>
+
+            <div class="form-grid">
+                <label class="form-label">내용</label>
+                <textarea name="content" required></textarea>
+            </div>
+
+            <div class="actions">
+                <a class="btn btn-ghost" href="javascript:history.back();">취소</a>
+                <button class="btn btn-primary" type="submit">등록</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<%@ include file="/view/usr/common/footer.jsp" %>
 </body>
 </html>

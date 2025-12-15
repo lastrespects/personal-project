@@ -26,6 +26,7 @@ public class UsrHomeController {
     public String showMain(HttpSession session, Model model, Principal principal) {
         Integer loginedMemberId = SessionMemberUtil.getSessionMemberId(session);
 
+        // 세션에 loginedMemberId 없지만 principal이 있으면 세팅
         if (loginedMemberId == null && principal != null) {
             memberService.findByUsername(principal.getName()).ifPresent(member -> {
                 session.setAttribute("loginedMemberId", member.getId());
@@ -33,8 +34,10 @@ public class UsrHomeController {
             loginedMemberId = SessionMemberUtil.getSessionMemberId(session);
         }
 
+        // 로그인/비로그인 공통 데이터
         if (loginedMemberId != null) {
             memberService.findById(loginedMemberId).ifPresent(member -> model.addAttribute("member", member));
+
             long todayLearnedCount = fullLearningService.getTodayLearnedCount(loginedMemberId);
             int todayTarget = fullLearningService.getDailyTarget(loginedMemberId);
             long quizSolvedCount = fullLearningService.getTodayQuizSolvedCount(loginedMemberId);
@@ -51,9 +54,15 @@ public class UsrHomeController {
             model.addAttribute("quizRemainingCount", 30);
         }
 
+        // ✅ 공지 최신글
         int noticeBoardId = 1;
         var notices = articleService.findLatestArticles(noticeBoardId, 3);
         model.addAttribute("notices", notices);
+
+        // ✅ Q&A 최신글 (공지 자리로 내려보낼 거)
+        int qnaBoardId = 2;
+        var qnas = articleService.findLatestArticles(qnaBoardId, 3);
+        model.addAttribute("qnas", qnas);
 
         return "usr/home/main";
     }

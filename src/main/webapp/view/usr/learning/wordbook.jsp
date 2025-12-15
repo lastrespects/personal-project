@@ -5,6 +5,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/mmb.css">
     <title>오늘의 학습 단어 - My Memory Book</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 24px; }
@@ -19,6 +20,7 @@
     </style>
 </head>
 <body>
+    <%@ include file="/view/usr/common/header.jsp" %>
     <h1 class="page-title">오늘의 학습 단어</h1>
     <p class="sub-info">
         오늘 목표 <strong>${dailyTarget}</strong>개 중 준비된 단어는 총 <strong>${todayWords.size()}</strong>개입니다.
@@ -99,5 +101,6 @@
             speechSynthesis.speak(utter);
         }
     </script>
+    <%@ include file="/view/usr/common/footer.jsp" %>
 </body>
 </html>

@@ -14,6 +14,7 @@
 
 					<head>
 						<meta charset="UTF-8">
+						<link rel="stylesheet" href="${pageContext.request.contextPath}/mmb.css">
 						<title>오늘의 퀴즈 - My Memory Book</title>
 						<style>
 							body {
@@ -129,6 +130,7 @@
 					</head>
 
 					<body>
+						<%@ include file="/view/usr/common/header.jsp" %>
 						<h1 class="page-title">오늘의 퀴즈</h1>
 						<p class="sub-info">오늘 학습할 단어는 총 <strong>
 								<%= count %>
@@ -278,6 +280,7 @@
 								</script>
 								<div style="text-align:center; color:#ccc; font-size:12px; margin-top:20px;">v1.3
 									(Controller Logic Refactor)</div>
+									<%@ include file="/view/usr/common/footer.jsp" %>
 					</body>
 
 					</html>

@@ -3,6 +3,7 @@ package com.mmb.config;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -54,6 +55,13 @@ public class SecurityConfig {
         http.authenticationProvider(authenticationProvider);
 
         http.authorizeHttpRequests(auth -> auth
+                // ✅ 1) Spring Boot 표준 static 경로(css/js/images/webjars/favicon 등) 전부 허용
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+
+                // ✅ 2) 네가 static 루트에 둔 mmb.css 직접 허용 (http://localhost:8081/mmb.css)
+                .requestMatchers("/mmb.css").permitAll()
+
+                // ✅ 3) 기존 permitAll 목록 유지
                 .requestMatchers(
                         "/login",
                         "/usr/member/login",
@@ -78,6 +86,7 @@ public class SecurityConfig {
                         "/error",
                         "/favicon.ico"
                 ).permitAll()
+
                 .anyRequest().authenticated()
         );
 

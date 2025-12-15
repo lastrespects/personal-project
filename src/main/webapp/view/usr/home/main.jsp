@@ -1,153 +1,164 @@
 ﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-    <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-        <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
-            <!DOCTYPE html>
-            <html>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-            <head>
-                <meta charset="UTF-8">
-                <title>메인 - My Memory Book</title>
-                <style>
-                    body {
-                        font-family: "Noto Sans KR", Arial, sans-serif;
-                        margin: 24px;
-                    }
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/mmb.css">
+  <title>메인 - My Memory Book</title>
+</head>
 
-                    h1 {
-                        color: #d60000;
-                    }
+<body>
+<%@ include file="/view/usr/common/header.jsp" %>
 
-                    .panel {
-                        border: 1px solid #d1d5db;
-                        padding: 12px;
-                        border-radius: 8px;
-                    }
+<main class="page">
+  <div class="container">
 
-                    .stats p {
-                        margin: 4px 0;
-                    }
+    <!-- ✅ 공지사항: 메인 최상단(기존 “메인 카드 자리”) -->
+    <section class="card" style="padding:18px; margin-bottom:16px;">
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <span class="badge primary">공지</span>
 
-                    .menu-buttons button {
-                        width: 200px;
-                        height: 50px;
-                        font-size: 18px;
-                        margin-right: 10px;
-                    }
+        <div style="flex:1; min-width:240px;">
+          <c:choose>
+            <c:when test="${not empty notices}">
+              <ul style="margin:0; padding-left:18px;">
+                <c:forEach var="a" items="${notices}">
+                  <li style="margin:4px 0;">
+                    <a href="${pageContext.request.contextPath}/usr/article/detail?id=${a.id}"
+                       style="font-weight:800;">
+                      ${a.title}
+                    </a>
+                  </li>
+                </c:forEach>
+              </ul>
+            </c:when>
+            <c:otherwise>
+              <div class="subtitle">등록된 공지가 없습니다.</div>
+            </c:otherwise>
+          </c:choose>
+        </div>
 
-                    .notice-list {
-                        list-style: none;
-                        padding-left: 16px;
-                    }
+        <a class="btn btn-ghost"
+           href="${pageContext.request.contextPath}/usr/article/list?boardId=1"
+           style="margin-left:auto;">
+          전체 보기 →
+        </a>
+      </div>
+    </section>
 
-                    .notice-list li {
-                        margin-bottom: 6px;
-                    }
-                </style>
-                <script>
-                    // ✅ Flash Attribute 또는 URL 파라미터 msg 처리
-                    window.addEventListener('load', () => {
-                        let msg = '';
+    <!-- ✅ 2열 레이아웃 -->
+    <div style="display:grid; grid-template-columns: 280px 1fr; gap:16px; align-items:start;">
+      <!-- 왼쪽: 내 캐릭터 -->
+      <section class="card" style="padding:18px;">
+        <h3 style="margin:0 0 12px; font-size:18px; letter-spacing:-.3px;">내 캐릭터</h3>
 
-                        // 1. Flash Attribute (서버에서 전달된 값)
-                        <c:if test="${not empty msg}">
-                            msg = "${fn:escapeXml(msg)}";
-                        </c:if>
+        <!-- ✅ 캐릭터 이미지 추가 -->
+  <div style="display:flex; justify-content:center; margin: 6px 0 14px;">
+    <img class="mmb-character"
+         src="${pageContext.request.contextPath}/img/character.png"
+         alt="MMB 캐릭터">
+  </div>
 
-                        // 2. URL Parameter (하위 호환성)
-                        if (!msg) {
-                            try {
-                                const url = new URL(window.location.href);
-                                const paramMsg = url.searchParams.get('msg');
-                                if (paramMsg && paramMsg.trim().length > 0) {
-                                    msg = paramMsg;
-                                    // URL 정리
-                                    url.searchParams.delete('msg');
-                                    const qs = url.searchParams.toString();
-                                    history.replaceState(null, '', url.pathname + (qs ? '?' + qs : ''));
-                                }
-                            } catch (e) { /* ignore */ }
-                        }
+        <c:choose>
+          <c:when test="${not empty member}">
+            <div style="display:grid; gap:10px;">
+              <div style="display:flex; justify-content:space-between; border-bottom:1px dashed var(--line); padding-bottom:8px;">
+                <span class="subtitle">닉네임</span>
+                <b>${member.nickname}</b>
+              </div>
+              <div style="display:flex; justify-content:space-between; border-bottom:1px dashed var(--line); padding-bottom:8px;">
+                <span class="subtitle">레벨</span>
+                <b>${member.characterLevel}</b>
+              </div>
+              <div style="display:flex; justify-content:space-between; border-bottom:1px dashed var(--line); padding-bottom:8px;">
+                <span class="subtitle">경험치</span>
+                <b>${member.currentExp} / 100</b>
+              </div>
+              <div style="display:flex; justify-content:space-between;">
+                <span class="subtitle">일일 학습량</span>
+                <b>${member.dailyTarget}</b>
+              </div>
 
-                        if (msg && msg.trim().length > 0) {
-                            alert(msg);
-                        }
-                    });
-                </script>
-            </head>
+              <a class="btn" href="${pageContext.request.contextPath}/usr/member/myPage" style="margin-top:10px; width:fit-content;">
+                마이페이지
+              </a>
+            </div>
+          </c:when>
 
-            <body>
+          <c:otherwise>
+            <p class="subtitle" style="margin:0;">로그인하면 캐릭터 정보가 표시돼요.</p>
+          </c:otherwise>
+        </c:choose>
+      </section>
 
-                <div style="text-align:right; margin:10px 0;">
-                    <c:choose>
-                        <c:when test="${pageContext.request.userPrincipal == null}">
-                            <button onclick="location.href='/login'">로그인</button>
-                        </c:when>
-                        <c:otherwise>
-                            <c:set var="displayNickname"
-                                value="${not empty member ? member.nickname : pageContext.request.userPrincipal.name}" />
-                            <a href="/usr/member/myPage" style="margin-right:8px;">${displayNickname} 님</a>
-                            <form action="/logout" method="post" style="display:inline;">
-                                <button type="submit">로그아웃</button>
-                            </form>
-                        </c:otherwise>
-                    </c:choose>
-                </div>
+      <!-- 오른쪽: 요약 + Q&A -->
+      <div style="display:grid; gap:16px;">
 
-                <h1>(샘플) 메인 JSP 페이지</h1>
+        <!-- 오늘 학습 요약 -->
+        <section class="card" style="padding:18px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+            <h3 style="margin:0; font-size:18px; letter-spacing:-.3px;">오늘 학습 요약</h3>
+            <span class="badge primary">Today</span>
+          </div>
 
-                <div style="display:flex; gap:20px; align-items:flex-start;">
-                    <div class="panel" style="width:240px;">
-                        <h3>내 캐릭터</h3>
-                        <c:if test="${not empty member}">
-                            <p>닉네임: ${member.nickname}</p>
-                            <p>레벨: ${member.characterLevel}</p>
-                            <p>경험치: ${member.currentExp} / 100</p>
-                            <p>일일 학습량: ${member.dailyTarget}</p>
-                        </c:if>
-                    </div>
+          <div style="margin-top:12px; display:grid; gap:10px;">
+            <div style="display:flex; justify-content:space-between; border-bottom:1px dashed var(--line); padding-bottom:10px;">
+              <span>오늘 목표</span>
+              <b>${todayTarget}개</b>
+            </div>
+            <div style="display:flex; justify-content:space-between; border-bottom:1px dashed var(--line); padding-bottom:10px;">
+              <span>푼 문제</span>
+              <b>${quizSolvedCount}개</b>
+            </div>
+            <div style="display:flex; justify-content:space-between; border-bottom:1px dashed var(--line); padding-bottom:10px;">
+              <span>남은 문제</span>
+              <b>${quizRemainingCount}개</b>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span>오늘 학습한 단어</span>
+              <b>${todayLearnedCount}개</b>
+            </div>
+          </div>
 
-                    <div style="flex:1;">
-                        <div class="panel stats" style="margin-bottom:12px; border-color:#3b82f6;">
-                            <h3>오늘 학습 요약</h3>
-                            <p>오늘 목표: <strong>${todayTarget}</strong>개</p>
-                            <p>푼 문제: <strong>${quizSolvedCount}</strong>개</p>
-                            <p>남은 문제: <strong>${quizRemainingCount}</strong>개</p>
-                            <p>오늘 학습한 단어: <strong>${todayLearnedCount}</strong>개</p>
-                        </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;">
+            <a class="btn btn-primary" href="${pageContext.request.contextPath}/learning/quiz">오늘의 퀴즈</a>
+            <a class="btn" href="${pageContext.request.contextPath}/learning/wordbook">오늘의 단어장</a>
+            <a class="btn" href="${pageContext.request.contextPath}/usr/study/log">학습 로그</a>
+          </div>
+        </section>
 
-                        <div class="panel">
-                            <h3>최근 공지사항</h3>
-                            <c:if test="${empty notices}">
-                                <p>등록된 공지가 없습니다.</p>
-                            </c:if>
-                            <c:if test="${not empty notices}">
-                                <ul class="notice-list">
-                                    <c:forEach var="article" items="${notices}">
-                                        <li>
-                                            <a href="/usr/article/detail?id=${article.id}">${article.title}</a>
-                                        </li>
-                                    </c:forEach>
-                                </ul>
-                                <p style="text-align:right;">
-                                    <a href="/usr/article/list?boardId=1">공지 전체 보기 »</a>
-                                </p>
-                            </c:if>
-                        </div>
-                    </div>
-                </div>
+        <!-- ✅ 여기가 원래 공지 자리였던 곳 → Q&A 최신글 배치 -->
+        <section class="card" style="padding:18px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+            <h3 style="margin:0; font-size:18px; letter-spacing:-.3px;">최근 Q&amp;A</h3>
+            <a class="btn btn-ghost" href="${pageContext.request.contextPath}/usr/article/list?boardId=2">전체 보기 →</a>
+          </div>
 
-                <hr style="margin:30px 0;">
+          <c:choose>
+            <c:when test="${empty qnas}">
+              <p class="subtitle" style="margin:10px 0 0;">등록된 질문이 없습니다.</p>
+            </c:when>
+            <c:otherwise>
+              <ul style="margin:12px 0 0; padding-left:18px;">
+                <c:forEach var="q" items="${qnas}">
+                  <li style="margin:6px 0;">
+                    <a href="${pageContext.request.contextPath}/usr/article/detail?id=${q.id}" style="font-weight:800;">
+                      ${q.title}
+                    </a>
+                  </li>
+                </c:forEach>
+              </ul>
+            </c:otherwise>
+          </c:choose>
+        </section>
 
-                <section>
-                    <h2>오늘 학습 메뉴</h2>
-                    <div class="menu-buttons" style="margin-top:10px;">
-                        <button onclick="location.href='/learning/wordbook'">오늘의 단어장</button>
-                        <button onclick="location.href='/learning/quiz'">오늘의 퀴즈</button>
-                        <button onclick="location.href='/usr/study/log'">학습 로그</button>
-                        <button onclick="location.href='/usr/article/list?boardId=2'">질문하기(Q&A)</button>
-                    </div>
-                </section>
+      </div>
+    </div>
+  </div>
+</main>
 
-            </body>
-
-            </html>
+<%@ include file="/view/usr/common/footer.jsp" %>
+</body>
+</html>

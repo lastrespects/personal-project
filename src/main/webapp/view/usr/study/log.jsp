@@ -4,6 +4,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/mmb.css">
     <title>학습 로그 - My Memory Book</title>
     <style>
         body { font-family: "Noto Sans KR", Arial, sans-serif; margin: 32px; }
@@ -26,6 +27,7 @@
     </style>
 </head>
 <body>
+    <%@ include file="/view/usr/common/header.jsp" %>
     <h1>학습 로그</h1>
     <p class="desc">최근 100개의 학습 기록입니다. (퀴즈/단어장 별로 기록됩니다.)</p>
 
@@ -89,5 +91,6 @@
     <div class="actions">
         <button class="btn secondary" onclick="location.href='/usr/home/main'">메인으로 돌아가기</button>
     </div>
+    <%@ include file="/view/usr/common/footer.jsp" %>
 </body>
 </html>
